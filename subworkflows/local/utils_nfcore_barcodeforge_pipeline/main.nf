@@ -1,5 +1,5 @@
 //
-// Subworkflow with functionality specific to the gp201/barcodeforge pipeline
+// Subworkflow with functionality specific to the andersen-lab/barcodeforge pipeline
 //
 
 /*

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/gp201/barcodeforge/master/nextflow_schema.json",
-  "title": "gp201/barcodeforge pipeline parameters",
+  "$id": "https://raw.githubusercontent.com/andersen-lab/barcodeforge/master/nextflow_schema.json",
+  "title": "andersen-lab/barcodeforge pipeline parameters",
   "description": "This pipeline enables the generation of barcodes for use with the Freyja.",
   "type": "object",
   "$defs": {
