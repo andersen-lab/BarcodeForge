@@ -9,13 +9,13 @@ md5sum:
 	bash assets/test/md5.sh
 
 run-test-newick: clean
-	nextflow run main.nf -profile test,mamba -params-file assets/test/input/params_nwk.json
+	nextflow run main.nf -profile test,mamba -params-file assets/test/input/params_newick.json
 	$(MAKE) md5sum
 
 run-test-nexus: clean
 	nextflow run main.nf -profile test,mamba -params-file assets/test/input/params_nexus.json
 	$(MAKE) md5sum
 
-test: clean
-	$(MAKE) run-test-nwk
+test:
+	$(MAKE) run-test-newick
 	$(MAKE) run-test-nexus
