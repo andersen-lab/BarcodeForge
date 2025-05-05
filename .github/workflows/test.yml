@@ -28,3 +28,4 @@ jobs:
       - name: Run test ${{ matrix.tree_format }} ${{ matrix.profile }}
         run: |
           nextflow run main.nf -profile test,${{ matrix.profile }} -params-file assets/test/input/params_${{ matrix.tree_format }}.json
+          make md5sum
