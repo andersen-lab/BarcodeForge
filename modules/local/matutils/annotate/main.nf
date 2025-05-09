@@ -7,6 +7,7 @@ process MATUTILS_ANNOTATE {
     input:
     path protobuf_tree_file
     path clades
+    val matUtils_overlap
 
     output:
     path 'annotated_tree.pb', emit: annotated_tree_file
@@ -18,6 +19,7 @@ process MATUTILS_ANNOTATE {
     matUtils \\
         annotate \\
         ${args} \\
+        --set-overlap ${matUtils_overlap} \\
         -i ${protobuf_tree_file} \\
         -c ${clades} \\
         -o annotated_tree.pb

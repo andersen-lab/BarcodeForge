@@ -6,6 +6,7 @@
     "tree_file_format": "nexus",
     "lineages": "${projectDir}/assets/test/input/lineages.tsv",
     "barcode_prefix": "RSVa",
+    "matUtils_overlap": 0.8,
 
     "outdir": "results"
 }
