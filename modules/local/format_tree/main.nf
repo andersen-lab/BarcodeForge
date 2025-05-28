@@ -4,7 +4,6 @@ process FORMAT_TREE {
 
     conda "${moduleDir}/environment.yml"
 
-
     input:
     path tree_file
     val tree_file_format

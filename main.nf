@@ -13,9 +13,9 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { BARCODEFORGE } from './workflows/barcodeforge'
+include { BARCODEFORGE            } from './workflows/barcodeforge'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_barcodeforge_pipeline'
-include { PIPELINE_COMPLETION } from './subworkflows/local/utils_nfcore_barcodeforge_pipeline'
+include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_barcodeforge_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

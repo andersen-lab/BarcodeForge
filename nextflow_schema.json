@@ -13,17 +13,24 @@
       "properties": {
         "tree_file": {
           "type": "string",
+          "format": "file-path",
+          "description": "Path to the phylogenetic tree file (supports Newick and Nexus formats).",
           "fa_icon": "fas fa-tree"
         },
         "tree_file_format": {
           "type": "string",
-          "default": "newick"
+          "description": "Format of the tree file (\"newick\" or \"nexus\").",
+          "default": "newick",
+          "enum": ["newick", "nexus"]
         },
         "lineages": {
-          "type": "string"
+          "type": "string",
+          "format": "file-path",
+          "description": "two-column tsv file with lineage assignment, clades in the first column and sample identifiers in the second"
         },
         "barcode_prefix": {
           "type": "string",
+          "description": "A prefix string added to all generated barcodes (e.g. <prefix>-<lineage>).",
           "default": "pathogen",
           "fa_icon": "fas fa-barcode"
         }
@@ -37,10 +44,14 @@
       "default": "",
       "properties": {
         "reference_genome": {
-          "type": "string"
+          "type": "string",
+          "format": "file-path",
+          "description": "Path to the reference genome file used for alignment."
         },
         "alignment": {
           "type": "string",
+          "format": "file-path",
+          "description": "Path to the aligned FASTA file required for barcode generation.",
           "fa_icon": "fas fa-stream"
         }
       },
@@ -55,6 +66,7 @@
       "properties": {
         "outdir": {
           "type": "string",
+          "description": "Directory where the pipeline output (barcodes and logs) will be stored.",
           "default": "results",
           "fa_icon": "fas fa-folder-open"
         },
