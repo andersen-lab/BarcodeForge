@@ -4,10 +4,9 @@ import dendropy
 from ete4 import Tree
 from pathlib import Path
 import re
-from typing import Union
 
 
-def _remove_quotes_from_file(file_path: Union[Path, str]) -> None:
+def _remove_quotes_from_file(file_path: Path | str) -> None:
     """
     Remove all single and double quotes from the contents of a file.
     This function reads the entire contents of the file located at the given
@@ -15,7 +14,7 @@ def _remove_quotes_from_file(file_path: Union[Path, str]) -> None:
     using a regular expression, and writes the cleaned text back to the same
     file.
     Args:
-        file_path (Union[Path, str]): Path to the target file, provided either
+        file_path (Path or str): Path to the target file, provided either
             as a pathlib.Path object or a string representing the filesystem path.
     Raises:
         FileNotFoundError: If the specified file does not exist.
@@ -38,8 +37,8 @@ def _remove_quotes_from_file(file_path: Union[Path, str]) -> None:
 
 
 def convert_nexus_to_newick(
-    input_file: Union[Path, str],
-    output_file: Union[Path, str],
+    input_file: Path | str,
+    output_file: Path | str,
     input_format: str = "nexus",
     reformat_tree: bool = False,
 ):
