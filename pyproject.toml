@@ -1,9 +1,9 @@
 [project]
 name = "BarcodeForge"
 version = "1.0.0"
-description = "A Python package template."
+description = "A CLI tool for generating pathogen-specific barcodes for Freyja."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
     "dendropy>=4.5.2",
     "ete4>=4.3.0",
@@ -42,6 +42,6 @@ barcodeforge = "barcodeforge.cli:cli"
 # These packages are required and need to be installed separately using Conda.
 # For example: conda install -c bioconda usher ucsc-fatovcf
 packages = [
-    "usher",  # (from bioconda channel)
-    "ucsc-fatovcf",  # (from bioconda channel)
+    "usher",        # (from bioconda channel)
+    "ucsc-fatovcf", # (from bioconda channel)
 ]

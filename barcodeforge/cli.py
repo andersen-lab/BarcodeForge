@@ -140,6 +140,10 @@ def barcode(
         console.print(
             f"[{STYLES['success']}]Processed tree saved to {output_converted_tree_path} (if conversion/reformatting occurred)[/{STYLES['success']}]"
         )
+    else:
+        raise ValueError(
+            f"Unsupported tree format: {resolved_tree_format}. Expected 'newick' or 'nexus'."
+        )
 
     # Run usher command
     usher_cmd = ["usher"]
