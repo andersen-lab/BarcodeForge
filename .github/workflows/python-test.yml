@@ -46,7 +46,7 @@ jobs:
         shell: bash -l {0}
         run: |
           conda activate test
-          pytest -v --tb=short
+          pytest -vvv --tb=short
 
       - name: Run barcode generation test
         shell: bash -l {0}
