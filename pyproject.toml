@@ -36,6 +36,9 @@ test-requirements = [
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.packages.find]
+where = ["barcodeforge"]
+
 [project.scripts]
 barcodeforge = "barcodeforge.cli:cli"
 
