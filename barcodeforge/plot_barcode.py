@@ -54,6 +54,11 @@ def plot_barcode_altair(barcode_df_long: pd.DataFrame, output_html_path: str) ->
     n_positions = plot_df["pos"].nunique()
     n_lineages = plot_df["Lineage"].nunique()
     max_lineage_length = plot_df["Lineage"].str.len().max()
+
+    console.print(
+        f"[{STYLES['info']}]Creating barcode plot with {n_positions} positions and {n_lineages} lineages...[/{STYLES['info']}]"
+    )
+
     fig, ax = plt.subplots(
         figsize=(n_positions * 0.4 + max_lineage_length * 0.2, n_lineages * 0.25)
     )
@@ -119,7 +124,9 @@ def plot_barcode_altair(barcode_df_long: pd.DataFrame, output_html_path: str) ->
     plt.close()
 
 
-def create_barcode_plot(input_file_path: str, output_file_path: str) -> None:
+def create_barcode_plot(
+    input_file_path: str, debug: bool, output_file_path: str
+) -> None:
     """
     Reads a barcode CSV file, transforms it to long format, and generates an HTML plot.
 
@@ -127,14 +134,22 @@ def create_barcode_plot(input_file_path: str, output_file_path: str) -> None:
         input_file_path: Path to the input barcode CSV file.
         output_file_path: Path to save the generated HTML plot.
     """
-    console.print(
-        f"[{STYLES['info']}]Reading barcode data from: {input_file_path}[/{STYLES['info']}]"
-    )
+    if debug:
+        console.print(
+            f"[{STYLES['info']}]Reading barcode data from: {input_file_path}[/{STYLES['info']}]"
+        )
     barcode_df = pd.read_csv(input_file_path, header=0, index_col=0)
 
-    console.print(
-        f"[{STYLES['info']}]Transforming barcode data to long format...[/{STYLES['info']}]"
-    )
+    if debug:
+        console.print(
+            f"[{STYLES['debug']}]Barcode DataFrame shape: {barcode_df.shape}[/{STYLES['debug']}]"
+        )
+        console.print(
+            f"[{STYLES['debug']}]Barcode DataFrame columns: {barcode_df.columns.tolist()}[/{STYLES['debug']}]"
+        )
+        console.print(
+            f"[{STYLES['info']}]Transforming barcode data to long format...[/{STYLES['info']}]"
+        )
     barcode_df_long = barcode_df.stack().reset_index()
     barcode_df_long.columns = ["Lineage", "Mutation", "z"]
 

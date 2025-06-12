@@ -263,6 +263,7 @@ def barcode(
     )
     create_barcode_plot(
         input_file_path=csv_path,
+        debug=is_debug,
         output_file_path=barcode_render,
     )
 

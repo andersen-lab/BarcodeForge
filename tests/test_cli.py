@@ -132,7 +132,7 @@ def test_barcode_command_default_options(runner, temp_files, mocker):
         "-o",
         tree_pb_fn,
         "-T",
-        "1",
+        "8",
     ]
     expected_subprocess_calls = [
         call(
@@ -162,7 +162,7 @@ def test_barcode_command_default_options(runner, temp_files, mocker):
                 "-o",
                 annotated_tree_pb_fn,
                 "-T",
-                "1",
+                "8",
             ],
             mock_cli_console,
             False,
@@ -182,7 +182,7 @@ def test_barcode_command_default_options(runner, temp_files, mocker):
                 "-j",
                 auspice_json_fn,
                 "-T",
-                "1",
+                "8",
             ],
             mock_cli_console,
             False,
@@ -207,6 +207,7 @@ def test_barcode_command_default_options(runner, temp_files, mocker):
     )
     mock_create_plot.assert_called_once_with(
         input_file_path=final_barcodes_csv_fn,
+        debug=False,  # Default debug status
         output_file_path=final_barcode_plot_html_fn,
     )
 
@@ -360,6 +361,7 @@ def test_barcode_command_custom_options(runner, temp_files, mocker):
     )
     mock_create_plot.assert_called_once_with(
         input_file_path=final_barcodes_csv_fn,
+        debug=False,  # Default debug status
         output_file_path=final_barcode_plot_html_fn,
     )
 
@@ -412,7 +414,7 @@ def test_barcode_command_nexus_tree(runner, temp_files, mocker):
         "-o",
         tree_pb_fn,
         "-T",
-        "1",
+        "8",
     ]
     mock_run_subp.assert_any_call(
         expected_usher_cmd,
@@ -519,6 +521,7 @@ def test_barcode_command_debug_flag(runner, temp_files, mocker):
     )
     mock_create_plot.assert_called_once_with(
         input_file_path=final_barcodes_csv_fn,
+        debug=True,  # Debug status passed
         output_file_path=final_barcode_plot_html_fn,
     )
 
