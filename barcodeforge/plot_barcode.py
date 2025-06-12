@@ -11,7 +11,9 @@ from matplotlib.colors import ListedColormap
 console = Console()
 
 
-def create_barcode_visualization(barcode_df_long: pd.DataFrame, output_html_path: str) -> None:
+def create_barcode_visualization(
+    barcode_df_long: pd.DataFrame, output_html_path: str
+) -> None:
     """
     Generates and saves an Altair plot from a long-format barcode DataFrame.
 
