@@ -47,7 +47,7 @@ def cli(ctx, debug):
 @click.option(
     "--threads",
     type=int,
-    default=1,
+    default=8,
     show_default=True,
     help="Number of CPUs/threads to use.",
 )
