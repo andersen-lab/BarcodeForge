@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 from pathlib import Path
-from barcodeforge.plot_barcode import plot_barcode_altair, create_barcode_plot
+from barcodeforge.plot_barcode import create_barcode_visualization, create_barcode_plot
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.colors import ListedColormap
@@ -11,7 +11,7 @@ from matplotlib.colors import ListedColormap
 def df_refposalt_long_for_plotter():
     """
     Provides a long-format DataFrame where 'Mutation' is in 'RefPosAlt' format,
-    suitable for direct input to the plot_barcode_altair (matplotlib) function.
+    suitable for direct input to the create_barcode_visualization (matplotlib) function.
     Includes cases that will be filtered (z=0) and kept.
     """
     data = {
@@ -26,10 +26,10 @@ def test_plot_barcode_matplotlib_creates_image_file(
     df_refposalt_long_for_plotter: pd.DataFrame, tmp_path: Path
 ):
     """
-    Tests if plot_barcode_altair (matplotlib version) creates an output image file
+    Tests if create_barcode_visualization (matplotlib version) creates an output image file
     when given data it can parse.
     """
     output_file = tmp_path / "test_plot.png"
-    plot_barcode_altair(df_refposalt_long_for_plotter, str(output_file))
+    create_barcode_visualization(df_refposalt_long_for_plotter, str(output_file))
     assert output_file.exists()
     assert output_file.stat().st_size > 0  # Check if file is not empty
