@@ -254,7 +254,7 @@ def barcode(
         base_name = "barcode"
 
     csv_path = f"{base_name}.csv"
-    html_path = f"{base_name}_plot.html"
+    barcode_render = f"{base_name}_plot.pdf"
 
     create_barcodes_from_lineage_paths(
         input_file_path=os.path.join(intermediate_dir, "rerooted_lineage_paths.txt"),
@@ -263,11 +263,11 @@ def barcode(
     )
     create_barcode_plot(
         input_file_path=csv_path,
-        output_file_path=html_path,
+        output_file_path=barcode_render,
     )
 
     console.print(
-        f"[{STYLES['success']}]Generated barcodes are saved to '{csv_path}' and plot saved to '{html_path}'[/{STYLES['success']}]"
+        f"[{STYLES['success']}]Generated barcodes are saved to '{csv_path}' and plot saved to '{barcode_render}'[/{STYLES['success']}]"
     )
 
 
