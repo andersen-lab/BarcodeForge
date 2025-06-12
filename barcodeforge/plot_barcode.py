@@ -12,14 +12,14 @@ console = Console()
 
 
 def create_barcode_visualization(
-    barcode_df_long: pd.DataFrame, output_html_path: str
+    barcode_df_long: pd.DataFrame, output_path: str
 ) -> None:
     """
-    Generates and saves an Altair plot from a long-format barcode DataFrame.
+    Generates and saves an seaborn plot from a long-format barcode DataFrame.
 
     Args:
         barcode_df_long: Pandas DataFrame in long format with columns ["Lineage", "Mutation", "z"].
-        output_html_path: Path to save the generated HTML plot.
+        output_path: Path to save the generated plot.
     """
     # Filter out rows with zero z and extract details from Mutation
     df = barcode_df_long.loc[barcode_df_long["z"] != 0].copy()
@@ -122,7 +122,7 @@ def create_barcode_visualization(
     ax.set_xlabel("Genome Position")
     ax.set_ylabel("Lineage")
     plt.tight_layout()
-    plt.savefig(output_html_path, bbox_inches="tight")
+    plt.savefig(output_path, bbox_inches="tight")
     plt.close()
 
 
@@ -130,11 +130,11 @@ def create_barcode_plot(
     input_file_path: str, debug: bool, output_file_path: str
 ) -> None:
     """
-    Reads a barcode CSV file, transforms it to long format, and generates an HTML plot.
+    Reads a barcode CSV file, transforms it to long format, and generates a plot.
 
     Args:
         input_file_path: Path to the input barcode CSV file.
-        output_file_path: Path to save the generated HTML plot.
+        output_file_path: Path to save the generated plot.
     """
     if debug:
         console.print(

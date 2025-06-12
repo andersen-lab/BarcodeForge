@@ -112,7 +112,7 @@ def test_barcode_command_default_options(runner, temp_files, mocker):
     additional_muts_processed_fn = f"{intermediate_dir}/additional_mutations.tsv"
     rerooted_lineage_paths_fn = f"{intermediate_dir}/rerooted_lineage_paths.txt"
     final_barcodes_csv_fn = "barcode.csv"
-    final_barcode_plot_html_fn = "barcode_plot.pdf"
+    final_barcode_plot_fn = "barcode_plot.pdf"
 
     mock_resolve_format.assert_called_once_with(
         temp_files["tree"], None, mock_cli_console, False
@@ -208,7 +208,7 @@ def test_barcode_command_default_options(runner, temp_files, mocker):
     mock_create_plot.assert_called_once_with(
         input_file_path=final_barcodes_csv_fn,
         debug=False,  # Default debug status
-        output_file_path=final_barcode_plot_html_fn,
+        output_file_path=final_barcode_plot_fn,
     )
 
 
@@ -263,7 +263,7 @@ def test_barcode_command_custom_options(runner, temp_files, mocker):
     rerooted_lineage_paths_fn = f"{intermediate_dir}/rerooted_lineage_paths.txt"
 
     final_barcodes_csv_fn = f"{prefix}-barcode.csv"
-    final_barcode_plot_html_fn = f"{prefix}-barcode_plot.pdf"
+    final_barcode_plot_fn = f"{prefix}-barcode_plot.pdf"
 
     mock_resolve_format.assert_called_once_with(
         temp_files["tree"], None, mock_cli_console, False
@@ -362,7 +362,7 @@ def test_barcode_command_custom_options(runner, temp_files, mocker):
     mock_create_plot.assert_called_once_with(
         input_file_path=final_barcodes_csv_fn,
         debug=False,  # Default debug status
-        output_file_path=final_barcode_plot_html_fn,
+        output_file_path=final_barcode_plot_fn,
     )
 
 
@@ -492,7 +492,7 @@ def test_barcode_command_debug_flag(runner, temp_files, mocker):
     additional_muts_processed_fn = f"{intermediate_dir}/additional_mutations.tsv"
     rerooted_lineage_paths_fn = f"{intermediate_dir}/rerooted_lineage_paths.txt"
     final_barcodes_csv_fn = "barcode.csv"
-    final_barcode_plot_html_fn = "barcode_plot.pdf"
+    final_barcode_plot_fn = "barcode_plot.pdf"
 
     mock_cli_console.print.assert_any_call(
         f"[{STYLES['debug']}]Debug mode is ON[/{STYLES['debug']}]"
@@ -522,7 +522,7 @@ def test_barcode_command_debug_flag(runner, temp_files, mocker):
     mock_create_plot.assert_called_once_with(
         input_file_path=final_barcodes_csv_fn,
         debug=True,  # Debug status passed
-        output_file_path=final_barcode_plot_html_fn,
+        output_file_path=final_barcode_plot_fn,
     )
 
     for call_obj in mock_run_subp.call_args_list:
