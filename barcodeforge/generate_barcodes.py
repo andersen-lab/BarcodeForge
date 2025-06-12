@@ -267,8 +267,9 @@ def create_barcodes_from_lineage_paths(
     console.print(f"[{STYLES['info']}]Sorting barcode columns...[/{STYLES['info']}]")
     df_barcodes = df_barcodes.reindex(sorted(df_barcodes.columns, key=sortFun), axis=1)
 
-    # Drop Unclassified lineage if it exists
-    df_barcodes = df_barcodes.drop(index="unclassified")
+    # Drop unclassified lineage if it exists
+    if "unclassified" in df_barcodes.index:
+        df_barcodes = df_barcodes.drop(index="unclassified")
 
     df_barcodes.to_csv(output_file_path)
     console.print(

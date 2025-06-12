@@ -6,6 +6,7 @@ from rich.console import Console
 from .utils import sortFun, STYLES
 import seaborn as sns
 import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
 
 console = Console()
 
