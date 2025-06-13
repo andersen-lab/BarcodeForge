@@ -34,17 +34,20 @@ def cli(ctx, debug):
 @click.argument("tree", type=click.Path(exists=True, readable=True))
 @click.argument("lineages", type=click.Path(exists=True, readable=True))
 @click.option(
+    "-t",
     "--tree_format",
     type=click.Choice(["newick", "nexus"], case_sensitive=False),
     help="Specify the format of the tree file (newick or nexus)",
 )
 @click.option(
+    "-u",
     "--usher-args",
     type=str,
     default="",
     help="Additional arguments to pass to usher (e.g., '-U -l'). Quote multiple arguments.",
 )
 @click.option(
+    "-T",
     "--threads",
     type=int,
     default=8,
@@ -52,6 +55,7 @@ def cli(ctx, debug):
     help="Number of CPUs/threads to use.",
 )
 @click.option(
+    "-m",
     "--matutils-overlap",
     type=float,
     metavar="FLOAT",
@@ -60,6 +64,7 @@ def cli(ctx, debug):
     help="Value for --set-overlap in matUtils annotate.",
 )
 @click.option(
+    "-p",
     "--prefix",
     type=str,
     default="",
@@ -67,6 +72,7 @@ def cli(ctx, debug):
     help="Prefix to add to lineage names in the barcode file.",
 )
 @click.option(
+    "-c",
     "--plot-chunk-size",
     type=int,
     default=100,
