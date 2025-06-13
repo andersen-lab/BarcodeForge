@@ -35,7 +35,7 @@ def cli(ctx, debug):
 @click.argument("lineages", type=click.Path(exists=True, readable=True))
 @click.option(
     "-t",
-    "--tree_format",
+    "--tree-format",
     type=click.Choice(["newick", "nexus"], case_sensitive=False),
     help="Specify the format of the tree file (newick or nexus)",
 )
@@ -50,6 +50,7 @@ def cli(ctx, debug):
     "-T",
     "--threads",
     type=click.IntRange(min=1),
+    metavar="INT",
     default=8,
     show_default=True,
     help="Number of CPUs/threads to use.",
@@ -59,7 +60,7 @@ def cli(ctx, debug):
     "--matutils-overlap",
     type=click.FloatRange(min=0.0, max=1.0),
     metavar="FLOAT",
-    default="0",
+    default=0,
     show_default=True,
     help="Value for --set-overlap in matUtils annotate.",
 )
