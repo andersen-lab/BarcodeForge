@@ -117,6 +117,7 @@ def _sanitize_mutation_data(mutations):
 
 
 def process_and_reroot_lineages(
+    debug: bool,
     sample_muts_path: str,
     reference_fasta_path: str,
     sequences_fasta_path: str,
@@ -146,6 +147,11 @@ def process_and_reroot_lineages(
         for i in additional_muts.keys():
             additional_muts[i]["ref"] = additional_muts[i].pop("base")
             additional_muts[i]["root"] = additional_muts[i].pop("mut")
+
+        if debug:
+            console.print(
+                f"[{STYLES['debug']}]Additional mutations derived from reference {ref.id}: {additional_muts}[/{STYLES['debug']}]"
+            )
     # else generate the root sequence
     else:
         console.print(

@@ -195,6 +195,7 @@ def test_process_and_reroot_lineages_ref_present(
     output_rerooted_lineages = tmp_path / "rerooted_lineages.tsv"
 
     process_and_reroot_lineages(
+        debug=False,
         sample_muts_path=str(muts_file_ref_present),
         reference_fasta_path=sample_ref_fasta_file,
         sequences_fasta_path=sample_seqs_fasta_file,  # sampleA is in here
@@ -265,6 +266,7 @@ def test_process_and_reroot_lineages_ref_not_in_muts_infer_root(
     mocker.patch("barcodeforge.ref_muts.console", mocked_console)
 
     process_and_reroot_lineages(
+        debug=False,
         sample_muts_path=str(muts_file),
         reference_fasta_path=sample_ref_fasta_file,  # ref_genome AAAAAAAAAA
         sequences_fasta_path=str(seqs_file),
@@ -349,6 +351,7 @@ def test_process_and_reroot_lineages_value_error_empty_root_seqs(
         match="No valid root sequences could be generated. Check input FASTA and sample mutations.",
     ):
         process_and_reroot_lineages(
+            debug=False,
             sample_muts_path=str(muts_file),
             reference_fasta_path=sample_ref_fasta_file,
             sequences_fasta_path=str(seqs_file),
@@ -385,6 +388,7 @@ def test_process_and_reroot_lineages_warning_missing_sample_in_fasta(
     # Additional muts (ref vs inferred): none
     # Rerooted paths: original
     process_and_reroot_lineages(
+        debug=False,
         sample_muts_path=str(muts_file),
         reference_fasta_path=sample_ref_fasta_file,
         sequences_fasta_path=str(seqs_file),

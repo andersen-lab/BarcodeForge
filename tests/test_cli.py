@@ -193,6 +193,7 @@ def test_barcode_command_default_options(runner, temp_files, mocker):
     mock_run_subp.assert_has_calls(expected_subprocess_calls, any_order=False)
 
     mock_process_reroot.assert_called_once_with(
+        debug=False,
         sample_muts_path=matutils_S_output_fn,
         reference_fasta_path=temp_files["ref_genome"],
         sequences_fasta_path=temp_files["alignment"],
@@ -207,9 +208,9 @@ def test_barcode_command_default_options(runner, temp_files, mocker):
         prefix="",  # Default prefix ""
     )
     mock_create_plot.assert_called_once_with(
-        debug=False,  # Add the debug argument
+        debug=False,
         input_file_path=final_barcodes_csv_fn,
-        chunk_size=100,  # Add chunk_size, default from CLI is 100
+        chunk_size=100,
         output_file_path=final_barcode_plot_fn,
     )
 
@@ -349,6 +350,7 @@ def test_barcode_command_custom_options(runner, temp_files, mocker):
     mock_run_subp.assert_has_calls(expected_subprocess_calls, any_order=False)
 
     mock_process_reroot.assert_called_once_with(
+        debug=False,
         sample_muts_path=matutils_S_output_fn,
         reference_fasta_path=temp_files["ref_genome"],
         sequences_fasta_path=temp_files["alignment"],
@@ -357,15 +359,15 @@ def test_barcode_command_custom_options(runner, temp_files, mocker):
         output_rerooted_lineage_paths_path=rerooted_lineage_paths_fn,
     )
     mock_create_barcodes.assert_called_once_with(
-        debug=False,  # Add the debug argument
+        debug=False,
         input_file_path=rerooted_lineage_paths_fn,
         output_file_path=final_barcodes_csv_fn,
         prefix=prefix,
     )
     mock_create_plot.assert_called_once_with(
-        debug=False,  # Add the debug argument
+        debug=False,
         input_file_path=final_barcodes_csv_fn,
-        chunk_size=100,  # Add chunk_size, default from CLI is 100 unless specified
+        chunk_size=100,
         output_file_path=final_barcode_plot_fn,
     )
 
@@ -511,6 +513,7 @@ def test_barcode_command_debug_flag(runner, temp_files, mocker):
     )
 
     mock_process_reroot.assert_called_once_with(
+        debug=True,
         sample_muts_path=matutils_S_output_fn,
         reference_fasta_path=temp_files["ref_genome"],
         sequences_fasta_path=temp_files["alignment"],
@@ -522,12 +525,12 @@ def test_barcode_command_debug_flag(runner, temp_files, mocker):
         debug=True,
         input_file_path=rerooted_lineage_paths_fn,
         output_file_path=final_barcodes_csv_fn,
-        prefix="",  # Default prefix ""
+        prefix="",
     )
     mock_create_plot.assert_called_once_with(
-        debug=True,  # Add the debug argument, should be True here
+        debug=True,
         input_file_path=final_barcodes_csv_fn,
-        chunk_size=100,  # Add chunk_size, default from CLI is 100
+        chunk_size=100,
         output_file_path=final_barcode_plot_fn,
     )
 

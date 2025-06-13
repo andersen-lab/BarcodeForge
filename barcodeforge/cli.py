@@ -236,6 +236,7 @@ def barcode(
     )
 
     process_and_reroot_lineages(
+        debug=is_debug,
         sample_muts_path=os.path.join(intermediate_dir, "samplePaths.txt"),
         reference_fasta_path=reference_genome,
         sequences_fasta_path=alignment,
