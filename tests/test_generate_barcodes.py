@@ -143,7 +143,9 @@ def temp_lineage_paths_file(tmp_path):
 
 def test_create_barcodes_from_lineage_paths(temp_lineage_paths_file, tmp_path):
     output_file = tmp_path / "output_barcodes.csv"
-    create_barcodes_from_lineage_paths(False, str(temp_lineage_paths_file), str(output_file))
+    create_barcodes_from_lineage_paths(
+        False, str(temp_lineage_paths_file), str(output_file)
+    )
     assert output_file.exists()
     df = pd.read_csv(output_file)
     assert not df.empty

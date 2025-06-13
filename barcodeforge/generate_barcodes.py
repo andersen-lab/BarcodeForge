@@ -253,7 +253,6 @@ def create_barcodes_from_lineage_paths(
         )
         df_barcodes.index = [prefix + "-" + str(i) for i in df_barcodes.index]
 
-
     console.print(
         f"[{STYLES['info']}]Performing reversion checking...[/{STYLES['info']}]"
     )
@@ -269,7 +268,9 @@ def create_barcodes_from_lineage_paths(
     df_barcodes = replace_underscore_with_dash(df_barcodes)
 
     if debug:
-        console.print(f"[{STYLES['info']}]Sorting barcode columns...[/{STYLES['info']}]")
+        console.print(
+            f"[{STYLES['info']}]Sorting barcode columns...[/{STYLES['info']}]"
+        )
     df_barcodes = df_barcodes.reindex(sorted(df_barcodes.columns, key=sortFun), axis=1)
 
     # Drop unclassified lineage if it exists
