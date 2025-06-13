@@ -1,6 +1,6 @@
 [project]
 name = "BarcodeForge"
-version = "1.0.0"
+version = "1.1.1"
 description = "A CLI tool for generating pathogen-specific barcodes for Freyja."
 readme = "README.md"
 requires-python = ">=3.10"
