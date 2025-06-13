@@ -389,7 +389,7 @@ def test_barcode_command_nexus_tree(runner, temp_files, mocker):
         temp_files["alignment"],
         temp_files["tree"],
         temp_files["lineages"],
-        "--tree_format",
+        "--tree-format",
         "nexus",
     ]
     result = runner.invoke(cli, args, catch_exceptions=False)
@@ -446,7 +446,7 @@ def test_barcode_command_newick_tree_reformat(runner, temp_files, mocker):
         temp_files["alignment"],
         temp_files["tree"],
         temp_files["lineages"],
-        "--tree_format",
+        "--tree-format",
         "newick",
     ]
     result = runner.invoke(cli, args, catch_exceptions=False)
