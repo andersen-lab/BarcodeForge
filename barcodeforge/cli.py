@@ -34,7 +34,7 @@ def cli(ctx, debug):
 @click.argument("tree", type=click.Path(exists=True, readable=True))
 @click.argument("lineages", type=click.Path(exists=True, readable=True))
 @click.option(
-    "--tree-format",
+    "--tree_format",
     type=click.Choice(["newick", "nexus"], case_sensitive=False),
     help="Specify the format of the tree file (newick or nexus)",
 )
