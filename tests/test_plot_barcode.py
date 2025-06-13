@@ -30,6 +30,7 @@ def test_plot_barcode_matplotlib_creates_image_file(
     when given data it can parse.
     """
     output_file = tmp_path / "test_plot.png"
-    create_barcode_visualization(df_refposalt_long_for_plotter, str(output_file))
+    # Provide a default chunk_size, e.g., -1 for no chunking or a specific number
+    create_barcode_visualization(df_refposalt_long_for_plotter, chunk_size=-1, output_path=str(output_file))
     assert output_file.exists()
     assert output_file.stat().st_size > 0  # Check if file is not empty

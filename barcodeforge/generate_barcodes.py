@@ -224,7 +224,7 @@ def replace_underscore_with_dash(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_barcodes_from_lineage_paths(
-    input_file_path: str, output_file_path: str, prefix: str = ""
+    debug: bool, input_file_path: str, output_file_path: str, prefix: str = ""
 ):
     """
     Generates a barcode CSV file from a lineage paths TSV file.
@@ -234,12 +234,14 @@ def create_barcodes_from_lineage_paths(
         output_file_path: Path to save the generated barcodes (CSV format).
         prefix: Optional prefix to add to lineage names in the barcode file.
     """
-    console.print(
-        f"[{STYLES['info']}]Reading lineage paths from: {input_file_path}[/{STYLES['info']}]"
-    )
+    if debug:
+        console.print(
+            f"[{STYLES['info']}]Reading lineage paths from: {input_file_path}[/{STYLES['info']}]"
+        )
     df = pd.read_csv(input_file_path, sep="\t")
 
-    console.print(f"[{STYLES['info']}]Parsing tree paths...[/{STYLES['info']}]")
+    if debug:
+        console.print(f"[{STYLES['info']}]Parsing tree paths...[/{STYLES['info']}]")
     df = parse_tree_paths(df)
 
     console.print(f"[{STYLES['info']}]Converting to barcodes...[/{STYLES['info']}]")
@@ -251,6 +253,7 @@ def create_barcodes_from_lineage_paths(
         )
         df_barcodes.index = [prefix + "-" + str(i) for i in df_barcodes.index]
 
+
     console.print(
         f"[{STYLES['info']}]Performing reversion checking...[/{STYLES['info']}]"
     )
@@ -259,12 +262,14 @@ def create_barcodes_from_lineage_paths(
     console.print(f"[{STYLES['info']}]Checking mutation chains...[/{STYLES['info']}]")
     df_barcodes = check_mutation_chain(df_barcodes)
 
-    console.print(
-        f"[{STYLES['info']}]Replacing underscores with dashes in lineage names...[/{STYLES['info']}]"
-    )
+    if debug:
+        console.print(
+            f"[{STYLES['info']}]Replacing underscores with dashes in lineage names...[/{STYLES['info']}]"
+        )
     df_barcodes = replace_underscore_with_dash(df_barcodes)
 
-    console.print(f"[{STYLES['info']}]Sorting barcode columns...[/{STYLES['info']}]")
+    if debug:
+        console.print(f"[{STYLES['info']}]Sorting barcode columns...[/{STYLES['info']}]")
     df_barcodes = df_barcodes.reindex(sorted(df_barcodes.columns, key=sortFun), axis=1)
 
     # Drop unclassified lineage if it exists

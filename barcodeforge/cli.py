@@ -66,6 +66,13 @@ def cli(ctx, debug):
     show_default=True,
     help="Prefix to add to lineage names in the barcode file.",
 )
+@click.option(
+    "--plot-chunk-size",
+    type=int,
+    default=100,
+    show_default=True,
+    help="Number of mutations to render in each plot chunk. Use -1 for no chunking.",
+)
 @click.pass_context
 def barcode(
     ctx,
@@ -78,6 +85,7 @@ def barcode(
     threads,
     matutils_overlap,
     prefix,
+    plot_chunk_size,
 ):
     """Process barcode data, including VCF generation, tree formatting, USHER placement, matUtils annotation, and matUtils extraction."""
     is_debug = ctx.obj.get("DEBUG", False)  # More robust way to get debug status
@@ -257,13 +265,15 @@ def barcode(
     plot_output_path = f"{base_name}_plot.pdf"
 
     create_barcodes_from_lineage_paths(
+        debug=is_debug,
         input_file_path=os.path.join(intermediate_dir, "rerooted_lineage_paths.txt"),
         output_file_path=csv_path,
         prefix=clean_prefix,
     )
     create_barcode_plot(
-        input_file_path=csv_path,
         debug=is_debug,
+        input_file_path=csv_path,
+        chunk_size=plot_chunk_size,
         output_file_path=plot_output_path,
     )
 
