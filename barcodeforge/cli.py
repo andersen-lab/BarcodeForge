@@ -49,7 +49,7 @@ def cli(ctx, debug):
 @click.option(
     "-T",
     "--threads",
-    type=int,
+    type=click.IntRange(min=1),
     default=8,
     show_default=True,
     help="Number of CPUs/threads to use.",
@@ -57,7 +57,7 @@ def cli(ctx, debug):
 @click.option(
     "-m",
     "--matutils-overlap",
-    type=float,
+    type=click.FloatRange(min=0.0, max=1.0),
     metavar="FLOAT",
     default="0",
     show_default=True,
