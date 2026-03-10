@@ -402,16 +402,16 @@ def test_process_and_reroot_lineages_warning_missing_sample_in_fasta(
     assert output_rerooted_lineages.exists()
 
     # Verify summary warning is shown (any missing samples triggers warning)
-    expected_warning_call_substr = (
-        "1 out of 2 samples"
-    )
+    expected_warning_call_substr = "1 out of 2 samples"
     assert any(
         expected_warning_call_substr in str(c_args)
         for c_args in mocked_console.print.call_args_list
     )
 
     # Verify per-sample warning is NOT shown when debug=False
-    per_sample_warning_substr = "Sample sampleMissing not found in FASTA file. Skipping."
+    per_sample_warning_substr = (
+        "Sample sampleMissing not found in FASTA file. Skipping."
+    )
     assert not any(
         per_sample_warning_substr in str(c_args)
         for c_args in mocked_console.print.call_args_list
@@ -466,7 +466,9 @@ def test_process_and_reroot_lineages_debug_shows_per_sample_warning(
     )
 
     # Verify per-sample warning IS shown when debug=True
-    per_sample_warning_substr = "Sample sampleMissing not found in FASTA file. Skipping."
+    per_sample_warning_substr = (
+        "Sample sampleMissing not found in FASTA file. Skipping."
+    )
     assert any(
         per_sample_warning_substr in str(c_args)
         for c_args in mocked_console.print.call_args_list
