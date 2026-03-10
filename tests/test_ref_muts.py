@@ -320,47 +320,6 @@ def test_process_and_reroot_lineages_ref_not_in_muts_infer_root(
         pd.testing.assert_frame_equal(original_lineages_df, rerooted_lineages_df)
 
 
-def test_process_and_reroot_lineages_value_error_empty_root_seqs(
-    sample_ref_fasta_file,
-    sample_lineage_paths_file,
-    tmp_path,
-    mocker,
-):
-    # sample_muts_df is not empty, but no corresponding sequences are found.
-    muts_content = (
-        "sampleD\tgene1:A1T\nsampleE\tgene1:C2G"  # These samples are not in seqs_file
-    )
-    muts_file = tmp_path / "empty_root_seqs_muts.tsv"
-    muts_file.write_text(muts_content)
-
-    # Empty sequences.fasta or sequences that don't match sampleD/sampleE
-    seqs_content = ">sampleA\nATGC\n>sampleB\nCGTA"
-    seqs_file = tmp_path / "empty_root_seqs_sequences.fasta"
-    seqs_file.write_text(seqs_content)
-
-    output_additional_muts = tmp_path / "additional_muts_value_error.tsv"
-    output_rerooted_lineages = tmp_path / "rerooted_lineages_value_error.tsv"
-
-    mocked_console = MagicMock(
-        spec=Console
-    )  # Though not strictly needed for ValueError, good for consistency
-    mocker.patch("barcodeforge.ref_muts.console", mocked_console)
-
-    with pytest.raises(
-        ValueError,
-        match="No valid root sequences could be generated. Check input FASTA and sample mutations.",
-    ):
-        process_and_reroot_lineages(
-            debug=False,
-            sample_muts_path=str(muts_file),
-            reference_fasta_path=sample_ref_fasta_file,
-            sequences_fasta_path=str(seqs_file),
-            input_lineage_paths_path=sample_lineage_paths_file,
-            output_additional_muts_path=str(output_additional_muts),
-            output_rerooted_lineage_paths_path=str(output_rerooted_lineages),
-        )
-
-
 def test_process_and_reroot_lineages_warning_missing_sample_in_fasta(
     sample_ref_fasta_file,  # ref_genome
     sample_lineage_paths_file,

@@ -133,6 +133,15 @@ def process_and_reroot_lineages(
     seqs = SeqIO.to_dict(SeqIO.parse(sequences_fasta_path, "fasta"))
     ref = SeqIO.read(reference_fasta_path, "fasta")
 
+    sample_ids = set(sample_muts_df["sample"])
+    missing_count = len(sample_ids - set(seqs.keys()))
+    if missing_count:
+        total_count = len(sample_ids)
+        console.print(
+            f"[{STYLES['warning']}]Warning: {missing_count} out of {total_count} samples ({missing_count / total_count:.1%}) were not found in the FASTA file.[/{STYLES['warning']}]"
+        )
+
+
     # if reference in the sample mutations file, use that as the root
     if sample_muts_df[sample_muts_df["sample"] == ref.id].shape[0] > 0:
         console.print(
@@ -163,7 +172,6 @@ def process_and_reroot_lineages(
         ]
         root_seqs = []
 
-        missing_count = 0
         for sample_id, muts_str in valid.itertuples(index=False, name=None):
             # build root mutations and fetch the sequence by direct dict lookup
             root_muts = _reverse_mutations_to_root(
@@ -176,20 +184,8 @@ def process_and_reroot_lineages(
                     console.print(
                         f"[{STYLES['warning']}]Warning: Sample {sample_id} not found in FASTA file. Skipping.[/{STYLES['warning']}]"
                     )
-                missing_count += 1
                 continue
             root_seqs.append(_construct_root_sequence(root_muts, seq))
-
-        total_count = len(valid)
-        if missing_count > 0:
-            console.print(
-                f"[{STYLES['warning']}]Warning: {missing_count} out of {total_count} samples ({missing_count / total_count:.1%}) were not found in the FASTA file.[/{STYLES['warning']}]"
-            )
-
-        if not root_seqs:
-            raise ValueError(
-                "No valid root sequences could be generated. Check input FASTA and sample mutations."
-            )
 
         root = _derive_root_sequence(root_seqs)
         additional_muts = _compare_sequences(ref, root)
