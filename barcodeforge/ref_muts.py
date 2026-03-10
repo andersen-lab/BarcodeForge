@@ -171,7 +171,7 @@ def process_and_reroot_lineages(
             )
             seq = seqs.get(sample_id, None)
             if seq is None:
-                # It's better to raise an error or handle this case explicitly
+                # In debug mode, log a per-sample warning and track missing samples for a summary warning below.
                 if debug:
                     console.print(
                         f"[{STYLES['warning']}]Warning: Sample {sample_id} not found in FASTA file. Skipping.[/{STYLES['warning']}]"
