@@ -368,6 +368,7 @@ def test_process_and_reroot_lineages_warning_missing_sample_in_fasta(
     mocker,
 ):
     # sample_muts_path with sampleA (valid) and sampleMissing (not in FASTA)
+    # 1 out of 2 samples missing, so summary warning is printed
     muts_content = "sampleA\tgene1:A2T,A7G\nsampleMissing\tgene1:C1G"
     muts_file = tmp_path / "missing_fasta_sample_muts.tsv"
     muts_file.write_text(muts_content)
@@ -400,12 +401,19 @@ def test_process_and_reroot_lineages_warning_missing_sample_in_fasta(
     assert output_additional_muts.exists()
     assert output_rerooted_lineages.exists()
 
-    # Verify warning for missing sample
+    # Verify summary warning is shown (any missing samples triggers warning)
     expected_warning_call_substr = (
-        "[yellow]Warning: Sample sampleMissing not found in FASTA file. Skipping."
+        "1 out of 2 samples"
     )
     assert any(
         expected_warning_call_substr in str(c_args)
+        for c_args in mocked_console.print.call_args_list
+    )
+
+    # Verify per-sample warning is NOT shown when debug=False
+    per_sample_warning_substr = "Sample sampleMissing not found in FASTA file. Skipping."
+    assert not any(
+        per_sample_warning_substr in str(c_args)
         for c_args in mocked_console.print.call_args_list
     )
 
@@ -424,3 +432,92 @@ def test_process_and_reroot_lineages_warning_missing_sample_in_fasta(
             )
     else:
         pd.testing.assert_frame_equal(original_lineages_df, rerooted_lineages_df)
+
+
+def test_process_and_reroot_lineages_debug_shows_per_sample_warning(
+    sample_ref_fasta_file,  # ref_genome
+    sample_lineage_paths_file,
+    tmp_path,
+    mocker,
+):
+    # When debug=True, the per-sample warning should be shown for each missing sample
+    muts_content = "sampleA\tgene1:A2T,A7G\nsampleMissing\tgene1:C1G"
+    muts_file = tmp_path / "debug_missing_muts.tsv"
+    muts_file.write_text(muts_content)
+
+    seqs_content = ">sampleA\nATAAAAAGAA\n>sampleOther\nCCCCCCCCCC"
+    seqs_file = tmp_path / "debug_missing_seqs.fasta"
+    seqs_file.write_text(seqs_content)
+
+    output_additional_muts = tmp_path / "additional_muts_debug.tsv"
+    output_rerooted_lineages = tmp_path / "rerooted_lineages_debug.tsv"
+
+    mocked_console = MagicMock(spec=Console)
+    mocker.patch("barcodeforge.ref_muts.console", mocked_console)
+
+    process_and_reroot_lineages(
+        debug=True,
+        sample_muts_path=str(muts_file),
+        reference_fasta_path=sample_ref_fasta_file,
+        sequences_fasta_path=str(seqs_file),
+        input_lineage_paths_path=sample_lineage_paths_file,
+        output_additional_muts_path=str(output_additional_muts),
+        output_rerooted_lineage_paths_path=str(output_rerooted_lineages),
+    )
+
+    # Verify per-sample warning IS shown when debug=True
+    per_sample_warning_substr = "Sample sampleMissing not found in FASTA file. Skipping."
+    assert any(
+        per_sample_warning_substr in str(c_args)
+        for c_args in mocked_console.print.call_args_list
+    )
+
+
+def test_process_and_reroot_lineages_summary_warning_any_missing(
+    sample_ref_fasta_file,
+    sample_lineage_paths_file,
+    tmp_path,
+    mocker,
+):
+    # 1 out of 5 samples missing — warning is always shown when any samples are missing
+    muts_content = (
+        "sampleA\tgene1:A2T\n"
+        "sampleB\tgene1:A6G\n"
+        "sampleC\tgene1:A3T\n"
+        "sampleD\tgene1:A4T\n"
+        "sampleMissing\tgene1:C1G"
+    )
+    muts_file = tmp_path / "below_threshold_muts.tsv"
+    muts_file.write_text(muts_content)
+
+    seqs_content = (
+        ">sampleA\nATAAAAAGAA\n"
+        ">sampleB\nAAAAAAGAAA\n"
+        ">sampleC\nAAATAAAAAA\n"
+        ">sampleD\nAAAATAAAAA\n"
+    )
+    seqs_file = tmp_path / "below_threshold_seqs.fasta"
+    seqs_file.write_text(seqs_content)
+
+    output_additional_muts = tmp_path / "additional_muts_below.tsv"
+    output_rerooted_lineages = tmp_path / "rerooted_lineages_below.tsv"
+
+    mocked_console = MagicMock(spec=Console)
+    mocker.patch("barcodeforge.ref_muts.console", mocked_console)
+
+    process_and_reroot_lineages(
+        debug=False,
+        sample_muts_path=str(muts_file),
+        reference_fasta_path=sample_ref_fasta_file,
+        sequences_fasta_path=str(seqs_file),
+        input_lineage_paths_path=sample_lineage_paths_file,
+        output_additional_muts_path=str(output_additional_muts),
+        output_rerooted_lineage_paths_path=str(output_rerooted_lineages),
+    )
+
+    # Verify summary warning IS shown even when only 1 out of 5 samples is missing
+    summary_warning_substr = "were not found in the FASTA file"
+    assert any(
+        summary_warning_substr in str(c_args)
+        for c_args in mocked_console.print.call_args_list
+    )

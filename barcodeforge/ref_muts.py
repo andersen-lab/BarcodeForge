@@ -163,6 +163,7 @@ def process_and_reroot_lineages(
         ]
         root_seqs = []
 
+        missing_count = 0
         for sample_id, muts_str in valid.itertuples(index=False, name=None):
             # build root mutations and fetch the sequence by direct dict lookup
             root_muts = _reverse_mutations_to_root(
@@ -171,11 +172,19 @@ def process_and_reroot_lineages(
             seq = seqs.get(sample_id, None)
             if seq is None:
                 # It's better to raise an error or handle this case explicitly
-                console.print(
-                    f"[{STYLES['warning']}]Warning: Sample {sample_id} not found in FASTA file. Skipping.[/{STYLES['warning']}]"
-                )
+                if debug:
+                    console.print(
+                        f"[{STYLES['warning']}]Warning: Sample {sample_id} not found in FASTA file. Skipping.[/{STYLES['warning']}]"
+                    )
+                missing_count += 1
                 continue
             root_seqs.append(_construct_root_sequence(root_muts, seq))
+
+        total_count = len(valid)
+        if missing_count > 0:
+            console.print(
+                f"[{STYLES['warning']}]Warning: {missing_count} out of {total_count} samples ({missing_count / total_count:.1%}) were not found in the FASTA file.[/{STYLES['warning']}]"
+            )
 
         if not root_seqs:
             raise ValueError(
