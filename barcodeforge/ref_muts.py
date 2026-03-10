@@ -141,7 +141,6 @@ def process_and_reroot_lineages(
             f"[{STYLES['warning']}]Warning: {missing_count} out of {total_count} samples ({missing_count / total_count:.1%}) were not found in the FASTA file.[/{STYLES['warning']}]"
         )
 
-
     # if reference in the sample mutations file, use that as the root
     if sample_muts_df[sample_muts_df["sample"] == ref.id].shape[0] > 0:
         console.print(
