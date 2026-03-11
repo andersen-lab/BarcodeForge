@@ -207,6 +207,8 @@ def check_mutation_chain(df_barcodes: pd.DataFrame) -> pd.DataFrame:
         # in case mutation path leads to a return to the reference.
         df_barcodes = reversion_checking(df_barcodes)
         seq_muts = identify_chains(df_barcodes)
+    # The barcode should be a binary sparse matrix
+    assert df_barcodes.isin([0, 1]).all(axis=None), "Barcode matrix should be binary"
     return df_barcodes
 
 

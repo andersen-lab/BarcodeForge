@@ -91,7 +91,7 @@ def test_check_mutation_chain(sample_barcode_data):
     assert isinstance(chained_df, pd.DataFrame)
 
 
-def test_check_mutation_chain():
+def test_check_mutation_chain_repetitve_mutations():
     sample_barcode_data = pd.DataFrame(
         {"A225G": [1], "A225T": [1], "C225A": [1], "G225T": [1], "T225C": [2]},
         index=["lineage"],
@@ -103,6 +103,20 @@ def test_check_mutation_chain():
     )
     pd.testing.assert_frame_equal(chained_df, df_barcodes_ideal)
 
+def test_check_mutation_chain_non_binary_values():
+    sample_barcode_data = pd.DataFrame(
+        {
+            "A225G": [1],
+            "A225T": [1],
+            "C225A": [1],
+            "G225T": [1],
+            "T225C": [2],
+            "C123A": [2],
+        },
+        index=["lineage"],
+    )
+    with pytest.raises(AssertionError, match="Barcode matrix should be binary"):
+        check_mutation_chain(sample_barcode_data.copy())
 
 def test_replace_underscore_with_dash():
     data = {"value": [1, 2]}
