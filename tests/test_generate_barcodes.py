@@ -103,6 +103,7 @@ def test_check_mutation_chain_repetitve_mutations():
     )
     pd.testing.assert_frame_equal(chained_df, df_barcodes_ideal)
 
+
 def test_check_mutation_chain_non_binary_values():
     sample_barcode_data = pd.DataFrame(
         {
@@ -117,6 +118,7 @@ def test_check_mutation_chain_non_binary_values():
     )
     with pytest.raises(AssertionError, match="Barcode matrix should be binary"):
         check_mutation_chain(sample_barcode_data.copy())
+
 
 def test_replace_underscore_with_dash():
     data = {"value": [1, 2]}
