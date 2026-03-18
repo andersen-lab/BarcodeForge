@@ -138,6 +138,37 @@ def check_no_flip_pairs(barcode_file: str):
         raise Exception(f"FAIL: flip pairs found: {flipPairs}")
 
 
+def check_allele_consistency(df_barcodes: pd.DataFrame):
+    """
+    Extract columns and ensure for every position ([1:-1]) there is only 1 reference allele ([0]).
+    Additionally check if any lineage has multiple alternative alleles at the same position.
+    """
+    pos_refs = {}
+    pos_cols = {}
+    for col in df_barcodes.columns:
+        pos = col[1:-1]
+        ref = col[0]
+        if pos in pos_refs:
+            if pos_refs[pos] != ref:
+                raise ValueError(
+                    f"Position {pos} has multiple reference alleles: '{pos_refs[pos]}' and '{ref}'"
+                )
+        else:
+            pos_refs[pos] = ref
+
+        if pos not in pos_cols:
+            pos_cols[pos] = []
+        pos_cols[pos].append(col)
+
+    for pos, cols in pos_cols.items():
+        if len(cols) > 1:
+            if (df_barcodes[cols].sum(axis=1) > 1).any():
+                lineages = df_barcodes[df_barcodes[cols].sum(axis=1) > 1].index.tolist()
+                raise ValueError(
+                    f"Position {pos} has multiple alternative alleles in lineages: {lineages}"
+                )
+
+
 def identify_chains(df_barcodes: pd.DataFrame) -> list:
     """
     Identify sequential mutations in the barcodes DataFrame.
@@ -207,6 +238,7 @@ def check_mutation_chain(df_barcodes: pd.DataFrame) -> pd.DataFrame:
         # in case mutation path leads to a return to the reference.
         df_barcodes = reversion_checking(df_barcodes)
         seq_muts = identify_chains(df_barcodes)
+    check_allele_consistency(df_barcodes)
     # The barcode should be a binary sparse matrix
     assert df_barcodes.isin([0, 1]).all(axis=None), "Barcode matrix should be binary"
     return df_barcodes

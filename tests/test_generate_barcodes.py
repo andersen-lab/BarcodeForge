@@ -9,6 +9,7 @@ from barcodeforge.generate_barcodes import (
     check_mutation_chain,
     replace_underscore_with_dash,
     create_barcodes_from_lineage_paths,
+    check_allele_consistency,
 )
 from barcodeforge.utils import sortFun  # Assuming sortFun is in utils
 
@@ -26,7 +27,6 @@ def sample_barcode_data():
         "T123C": [1, 0],
         "G456A": [1, 0],
         "C789T": [0, 1],
-        "A123T": [0, 0],  # For reversion check
     }
     df = pd.DataFrame(data, index=["A", "B"])
     return df
@@ -112,7 +112,7 @@ def test_check_mutation_chain_non_binary_values():
             "C225A": [1],
             "G225T": [1],
             "T225C": [2],
-            "C123A": [2],
+            "C123A": [-1],
         },
         index=["lineage"],
     )
@@ -126,6 +126,17 @@ def test_replace_underscore_with_dash():
     replaced_df = replace_underscore_with_dash(df)
     assert "lineage-A" in replaced_df.index
     assert "lineage-B" in replaced_df.index
+
+
+def test_check_allele_consistency():
+    df_valid = pd.DataFrame({"A123T": [1, 0], "A123C": [0, 1]})
+    check_allele_consistency(df_valid)  # Should not raise
+
+    df_invalid = pd.DataFrame({"A123T": [1, 0], "C123G": [0, 1]})
+    with pytest.raises(
+        ValueError, match="Position 123 has multiple reference alleles: 'A' and 'C'"
+    ):
+        check_allele_consistency(df_invalid)
 
 
 @pytest.fixture
