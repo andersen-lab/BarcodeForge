@@ -124,7 +124,9 @@ def barcode(
 
     if resolved_tree_format == "nexus":
         if is_debug:
-            print_info(f"Converting Nexus tree ({tree}) to Newick format at {output_converted_tree_path}...")
+            print_info(
+                f"Converting Nexus tree ({tree}) to Newick format at {output_converted_tree_path}..."
+            )
         convert_nexus_to_newick(
             input_file=tree,
             output_file=output_converted_tree_path,
@@ -133,15 +135,21 @@ def barcode(
         print_success(f"Converted tree saved to {output_converted_tree_path}")
     elif resolved_tree_format == "newick":
         if is_debug:
-            print_info(f"Processing Newick tree ({tree}) to {output_converted_tree_path}...")
+            print_info(
+                f"Processing Newick tree ({tree}) to {output_converted_tree_path}..."
+            )
         convert_nexus_to_newick(
             input_file=tree,
             output_file=output_converted_tree_path,
             input_format="newick",
         )
-        print_success(f"Processed tree saved to {output_converted_tree_path} (if conversion/reformatting occurred)")
+        print_success(
+            f"Processed tree saved to {output_converted_tree_path} (if conversion/reformatting occurred)"
+        )
     else:
-        print_error(f"Error: Unsupported tree format: {resolved_tree_format}. Expected 'newick' or 'nexus'.")
+        print_error(
+            f"Error: Unsupported tree format: {resolved_tree_format}. Expected 'newick' or 'nexus'."
+        )
         raise click.Abort()
 
     # Run usher command
@@ -262,7 +270,9 @@ def barcode(
         output_file_path=plot_output_path,
     )
 
-    print_success(f"Generated barcodes are saved to '{csv_path}' and plot saved to '{plot_output_path}'")
+    print_success(
+        f"Generated barcodes are saved to '{csv_path}' and plot saved to '{plot_output_path}'"
+    )
 
 
 @cli.command()

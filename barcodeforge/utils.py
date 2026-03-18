@@ -61,7 +61,9 @@ def resolve_tree_format(
             print_error(
                 f"Error: Unknown tree format for file '{tree_path}'. Extension '{ext}' is not recognized."
             )
-            print_error("Please specify the format using --tree-format ('newick' or 'nexus').")
+            print_error(
+                "Please specify the format using --tree-format ('newick' or 'nexus')."
+            )
             raise click.Abort()
 
     if debug:

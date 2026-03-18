@@ -90,7 +90,9 @@ def test_barcode_command_default_options(runner, temp_files, mocker):
         "barcodeforge.cli.create_barcodes_from_lineage_paths"
     )
     mock_create_plot = mocker.patch("barcodeforge.cli.create_barcode_plot")
-    mock_cli_console = mocker.patch.object(barcodeforge.utils, "console", MagicMock(spec=Console))
+    mock_cli_console = mocker.patch.object(
+        barcodeforge.utils, "console", MagicMock(spec=Console)
+    )
 
     args = [
         "barcode",
@@ -115,9 +117,7 @@ def test_barcode_command_default_options(runner, temp_files, mocker):
     final_barcodes_csv_fn = "barcode.csv"
     final_barcode_plot_fn = "barcode_plot.pdf"
 
-    mock_resolve_format.assert_called_once_with(
-        temp_files["tree"], None, False
-    )
+    mock_resolve_format.assert_called_once_with(temp_files["tree"], None, False)
     mock_convert_tree.assert_called_once_with(
         input_file=temp_files["tree"],
         output_file=converted_tree_fn,
@@ -225,7 +225,9 @@ def test_barcode_command_custom_options(runner, temp_files, mocker):
         "barcodeforge.cli.create_barcodes_from_lineage_paths"
     )
     mock_create_plot = mocker.patch("barcodeforge.cli.create_barcode_plot")
-    mock_cli_console = mocker.patch.object(barcodeforge.utils, "console", MagicMock(spec=Console))
+    mock_cli_console = mocker.patch.object(
+        barcodeforge.utils, "console", MagicMock(spec=Console)
+    )
 
     prefix = "MYPREFIX"
     custom_usher_args = "-U -l"
@@ -265,9 +267,7 @@ def test_barcode_command_custom_options(runner, temp_files, mocker):
     final_barcodes_csv_fn = f"{prefix}-barcode.csv"
     final_barcode_plot_fn = f"{prefix}-barcode_plot.pdf"
 
-    mock_resolve_format.assert_called_once_with(
-        temp_files["tree"], None, False
-    )
+    mock_resolve_format.assert_called_once_with(temp_files["tree"], None, False)
     mock_convert_tree.assert_called_once_with(
         input_file=temp_files["tree"],
         output_file=converted_tree_fn,
@@ -376,7 +376,9 @@ def test_barcode_command_nexus_tree(runner, temp_files, mocker):
     mocker.patch("barcodeforge.cli.process_and_reroot_lineages")
     mocker.patch("barcodeforge.cli.create_barcodes_from_lineage_paths")
     mocker.patch("barcodeforge.cli.create_barcode_plot")
-    mock_cli_console = mocker.patch.object(barcodeforge.utils, "console", MagicMock(spec=Console))
+    mock_cli_console = mocker.patch.object(
+        barcodeforge.utils, "console", MagicMock(spec=Console)
+    )
 
     args = [
         "barcode",
@@ -395,9 +397,7 @@ def test_barcode_command_nexus_tree(runner, temp_files, mocker):
     aligned_vcf_fn = f"{intermediate_dir}/aligned.vcf"
     tree_pb_fn = f"{intermediate_dir}/tree.pb"
 
-    mock_resolve_format.assert_called_once_with(
-        temp_files["tree"], "nexus", False
-    )
+    mock_resolve_format.assert_called_once_with(temp_files["tree"], "nexus", False)
     mock_convert_tree.assert_called_once_with(
         input_file=temp_files["tree"],
         output_file=converted_tree_fn,
@@ -432,7 +432,9 @@ def test_barcode_command_newick_tree_reformat(runner, temp_files, mocker):
     mocker.patch("barcodeforge.cli.process_and_reroot_lineages")
     mocker.patch("barcodeforge.cli.create_barcodes_from_lineage_paths")
     mocker.patch("barcodeforge.cli.create_barcode_plot")
-    mock_cli_console = mocker.patch.object(barcodeforge.utils, "console", MagicMock(spec=Console))
+    mock_cli_console = mocker.patch.object(
+        barcodeforge.utils, "console", MagicMock(spec=Console)
+    )
 
     args = [
         "barcode",
@@ -447,9 +449,7 @@ def test_barcode_command_newick_tree_reformat(runner, temp_files, mocker):
     assert result.exit_code == 0, f"CLI failed: {result.output}"
 
     converted_tree_fn = "barcodeforge_workdir/converted_tree.nwk"
-    mock_resolve_format.assert_called_once_with(
-        temp_files["tree"], "newick", False
-    )
+    mock_resolve_format.assert_called_once_with(temp_files["tree"], "newick", False)
     mock_convert_tree.assert_called_once_with(
         input_file=temp_files["tree"],
         output_file=converted_tree_fn,
@@ -470,7 +470,9 @@ def test_barcode_command_debug_flag(runner, temp_files, mocker):
         "barcodeforge.cli.create_barcodes_from_lineage_paths"
     )
     mock_create_plot = mocker.patch("barcodeforge.cli.create_barcode_plot")
-    mock_cli_console = mocker.patch.object(barcodeforge.utils, "console", MagicMock(spec=Console))
+    mock_cli_console = mocker.patch.object(
+        barcodeforge.utils, "console", MagicMock(spec=Console)
+    )
 
     args = [
         "--debug",  # Main CLI debug flag
@@ -495,9 +497,7 @@ def test_barcode_command_debug_flag(runner, temp_files, mocker):
     mock_cli_console.print.assert_any_call(
         f"[{STYLES['debug']}][DEBUG] Debug mode is ON[/{STYLES['debug']}]"
     )
-    mock_resolve_format.assert_called_once_with(
-        temp_files["tree"], None, True
-    )
+    mock_resolve_format.assert_called_once_with(temp_files["tree"], None, True)
     mock_convert_tree.assert_called_once_with(
         input_file=temp_files["tree"],
         output_file="barcodeforge_workdir/converted_tree.nwk",  # Unprefixed

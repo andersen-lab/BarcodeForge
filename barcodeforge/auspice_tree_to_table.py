@@ -252,4 +252,6 @@ def process_auspice_json(
     if not output_tree_path and not output_metadata_path:
         # This case should be handled by the CLI command to require at least one output.
         # However, a warning here is fine if called directly.
-        print_warning("No output requested. Use --output-tree and/or --output-metadata.")
+        print_warning(
+            "No output requested. Use --output-tree and/or --output-metadata."
+        )

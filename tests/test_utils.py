@@ -88,8 +88,12 @@ def test_run_subprocess_command_failure_called_process_error(mock_subproc_run):
         call(
             f"[{STYLES['error']}][ERROR] Test error CPE fail_cmd_cpe: Command '['fail_cmd_cpe']' returned non-zero exit status 1.[/{STYLES['error']}]"
         ),
-        call(f"[{STYLES['debug']}][DEBUG] fail_cmd_cpe stdout:\nout[/{STYLES['debug']}]"),
-        call(f"[{STYLES['debug']}][DEBUG] fail_cmd_cpe stderr:\nError output cpe[/{STYLES['debug']}]"),
+        call(
+            f"[{STYLES['debug']}][DEBUG] fail_cmd_cpe stdout:\nout[/{STYLES['debug']}]"
+        ),
+        call(
+            f"[{STYLES['debug']}][DEBUG] fail_cmd_cpe stderr:\nError output cpe[/{STYLES['debug']}]"
+        ),
     ]
     mock_console.print.assert_has_calls(expected_calls)
 
@@ -128,9 +132,15 @@ def test_run_subprocess_command_success_debug(mock_subproc_run):
         )
     assert result is True
     expected_calls = [
-        call(f"[{STYLES['debug']}][DEBUG] Running command: debug_cmd_success arg1[/{STYLES['debug']}]"),
-        call(f"[{STYLES['debug']}][DEBUG] debug_cmd_success stdout:\nDebug success output[/{STYLES['debug']}]"),
-        call(f"[{STYLES['debug']}][DEBUG] debug_cmd_success stderr:\nDebug success stderr[/{STYLES['debug']}]"),
+        call(
+            f"[{STYLES['debug']}][DEBUG] Running command: debug_cmd_success arg1[/{STYLES['debug']}]"
+        ),
+        call(
+            f"[{STYLES['debug']}][DEBUG] debug_cmd_success stdout:\nDebug success output[/{STYLES['debug']}]"
+        ),
+        call(
+            f"[{STYLES['debug']}][DEBUG] debug_cmd_success stderr:\nDebug success stderr[/{STYLES['debug']}]"
+        ),
         call(f"[{STYLES['success']}][SUCCESS] Debug success[/{STYLES['success']}]"),
     ]
     mock_console.print.assert_has_calls(expected_calls, any_order=False)
@@ -153,9 +163,15 @@ def test_run_subprocess_command_success_debug_empty_stderr(mock_subproc_run):
         )
     assert result is True
     expected_calls = [
-        call(f"[{STYLES['debug']}][DEBUG] Running command: debug_cmd_success_no_stderr[/{STYLES['debug']}]"),
-        call(f"[{STYLES['debug']}][DEBUG] debug_cmd_success_no_stderr stdout:\nDebug success output[/{STYLES['debug']}]"),
-        call(f"[{STYLES['success']}][SUCCESS] Debug success no stderr[/{STYLES['success']}]"),
+        call(
+            f"[{STYLES['debug']}][DEBUG] Running command: debug_cmd_success_no_stderr[/{STYLES['debug']}]"
+        ),
+        call(
+            f"[{STYLES['debug']}][DEBUG] debug_cmd_success_no_stderr stdout:\nDebug success output[/{STYLES['debug']}]"
+        ),
+        call(
+            f"[{STYLES['success']}][SUCCESS] Debug success no stderr[/{STYLES['success']}]"
+        ),
     ]
     mock_console.print.assert_has_calls(expected_calls, any_order=False)
     # Verify no stderr output line was printed (empty stderr is skipped)
@@ -180,11 +196,17 @@ def test_run_subprocess_command_failure_debug(mock_subproc_run):
             )
 
     expected_calls_in_order = [
-        call(f"[{STYLES['debug']}][DEBUG] Running command: {' '.join(cmd_list)}[/{STYLES['debug']}]"),
+        call(
+            f"[{STYLES['debug']}][DEBUG] Running command: {' '.join(cmd_list)}[/{STYLES['debug']}]"
+        ),
         call(
             f"[{STYLES['error']}][ERROR] Debug fail error {cmd_list[0]}: Command '{cmd_list}' returned non-zero exit status 1.[/{STYLES['error']}]"
         ),
-        call(f"[{STYLES['debug']}][DEBUG] {cmd_list[0]} stdout:\nDebug fail stdout[/{STYLES['debug']}]"),
-        call(f"[{STYLES['debug']}][DEBUG] {cmd_list[0]} stderr:\nDebug fail stderr[/{STYLES['debug']}]"),
+        call(
+            f"[{STYLES['debug']}][DEBUG] {cmd_list[0]} stdout:\nDebug fail stdout[/{STYLES['debug']}]"
+        ),
+        call(
+            f"[{STYLES['debug']}][DEBUG] {cmd_list[0]} stderr:\nDebug fail stderr[/{STYLES['debug']}]"
+        ),
     ]
     mock_console.print.assert_has_calls(expected_calls_in_order, any_order=False)

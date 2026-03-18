@@ -152,7 +152,9 @@ def process_and_reroot_lineages(
             additional_muts[i]["root"] = additional_muts[i].pop("mut")
 
         if debug:
-            print_debug(f"Additional mutations derived from reference {ref.id}: {additional_muts}")
+            print_debug(
+                f"Additional mutations derived from reference {ref.id}: {additional_muts}"
+            )
     # else generate the root sequence
     else:
         print_warning(
@@ -173,7 +175,9 @@ def process_and_reroot_lineages(
             if seq is None:
                 # In debug mode, log a per-sample warning and track missing samples for a summary warning below.
                 if debug:
-                    print_warning(f"Warning: Sample {sample_id} not found in FASTA file. Skipping.")
+                    print_warning(
+                        f"Warning: Sample {sample_id} not found in FASTA file. Skipping."
+                    )
                 continue
             root_seqs.append(_construct_root_sequence(root_muts, seq))
 
@@ -204,7 +208,9 @@ def process_and_reroot_lineages(
             lambda x: " ".join(x)
         )
     else:
-        print_info(f"Found {len(additional_muts_list)} additional mutations to incorporate into lineage paths.")
+        print_info(
+            f"Found {len(additional_muts_list)} additional mutations to incorporate into lineage paths."
+        )
 
         # add the additional mutations to the lineage paths after the first item
         # Ensure the logic for constructing the path string is robust
@@ -226,4 +232,6 @@ def process_and_reroot_lineages(
         )
 
     lineage_paths_df.to_csv(output_rerooted_lineage_paths_path, sep="\t")
-    print_success(f"Rerooted lineage paths saved to {output_rerooted_lineage_paths_path}")
+    print_success(
+        f"Rerooted lineage paths saved to {output_rerooted_lineage_paths_path}"
+    )
