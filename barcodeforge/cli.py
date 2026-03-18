@@ -1,19 +1,19 @@
 import os
 import rich_click as click
-from rich.console import Console
 from .format_tree import convert_nexus_to_newick
 from .utils import (
     resolve_tree_format,
     run_subprocess_command,
-    STYLES,
-)  # Import new utils
+    print_error,
+    print_success,
+    print_info,
+    print_debug,
+)
 from .ref_muts import process_and_reroot_lineages
 from .generate_barcodes import create_barcodes_from_lineage_paths
 from .plot_barcode import create_barcode_plot
 from .auspice_tree_to_table import process_auspice_json
 from . import __version__
-
-console = Console()
 
 
 @click.group()
@@ -25,7 +25,7 @@ def cli(ctx, debug):
     ctx.ensure_object(dict)
     ctx.obj["DEBUG"] = debug
     if debug:
-        console.print(f"[{STYLES['debug']}]Debug mode is ON[/{STYLES['debug']}]")
+        print_debug("Debug mode is ON")
 
 
 @cli.command()
@@ -97,19 +97,13 @@ def barcode(
     """Process barcode data, including VCF generation, tree formatting, USHER placement, matUtils annotation, and matUtils extraction."""
     is_debug = ctx.obj.get("DEBUG", False)  # More robust way to get debug status
 
-    console.print(
-        f"[bold {STYLES['info']}]Reference Genome:[/bold {STYLES['info']}]\t{reference_genome}"
-    )
-    console.print(
-        f"[bold {STYLES['info']}]Alignment:[/bold {STYLES['info']}]\t\t{alignment}"
-    )
-    console.print(f"[bold {STYLES['info']}]Tree:[/bold {STYLES['info']}]\t\t\t{tree}")
-    console.print(
-        f"[bold {STYLES['info']}]Lineages:[/bold {STYLES['info']}]\t\t{lineages}"
-    )
+    print_info(f"Reference Genome:\t{reference_genome}", bold=True)
+    print_info(f"Alignment:\t\t{alignment}", bold=True)
+    print_info(f"Tree:\t\t\t{tree}", bold=True)
+    print_info(f"Lineages:\t\t{lineages}", bold=True)
 
     # Use utility function to resolve tree format
-    resolved_tree_format = resolve_tree_format(tree, tree_format, console, is_debug)
+    resolved_tree_format = resolve_tree_format(tree, tree_format, is_debug)
 
     # Directory for intermediate files
     intermediate_dir = "barcodeforge_workdir"
@@ -120,7 +114,6 @@ def barcode(
     fatovcf_cmd = ["faToVcf", alignment, fatovcf_output_vcf]
     run_subprocess_command(
         fatovcf_cmd,
-        console,
         is_debug,
         success_message=f"Successfully created VCF file: {fatovcf_output_vcf}",
         error_message_prefix="Error running faToVcf",
@@ -131,34 +124,25 @@ def barcode(
 
     if resolved_tree_format == "nexus":
         if is_debug:
-            console.print(
-                f"[{STYLES['info']}]Converting Nexus tree ({tree}) to Newick format at {output_converted_tree_path}...[/{STYLES['info']}]"
-            )
+            print_info(f"Converting Nexus tree ({tree}) to Newick format at {output_converted_tree_path}...")
         convert_nexus_to_newick(
             input_file=tree,
             output_file=output_converted_tree_path,
             input_format="nexus",
         )
-        console.print(
-            f"[{STYLES['success']}]Converted tree saved to {output_converted_tree_path}[/{STYLES['success']}]"
-        )
+        print_success(f"Converted tree saved to {output_converted_tree_path}")
     elif resolved_tree_format == "newick":
         if is_debug:
-            console.print(
-                f"[{STYLES['info']}]Processing Newick tree ({tree}) to {output_converted_tree_path}...[/{STYLES['info']}]"
-            )
+            print_info(f"Processing Newick tree ({tree}) to {output_converted_tree_path}...")
         convert_nexus_to_newick(
             input_file=tree,
             output_file=output_converted_tree_path,
             input_format="newick",
         )
-        console.print(
-            f"[{STYLES['success']}]Processed tree saved to {output_converted_tree_path} (if conversion/reformatting occurred)[/{STYLES['success']}]"
-        )
+        print_success(f"Processed tree saved to {output_converted_tree_path} (if conversion/reformatting occurred)")
     else:
-        raise ValueError(
-            f"Unsupported tree format: {resolved_tree_format}. Expected 'newick' or 'nexus'."
-        )
+        print_error(f"Error: Unsupported tree format: {resolved_tree_format}. Expected 'newick' or 'nexus'.")
+        raise click.Abort()
 
     # Run usher command
     usher_cmd = ["usher"]
@@ -179,7 +163,6 @@ def barcode(
 
     run_subprocess_command(
         usher_cmd,
-        console,
         is_debug,
         success_message=f"Successfully ran USHER. Output protobuf: {usher_output_pb}",
         error_message_prefix="Error running USHER",
@@ -208,9 +191,8 @@ def barcode(
 
     run_subprocess_command(
         matutils_annotate_cmd,
-        console,
         is_debug,
-        success_message=f"Successfully ran matUtils annotate. Output: annotated_tree.pb",
+        success_message="Successfully ran matUtils annotate. Output: annotated_tree.pb",
         error_message_prefix="Error running matUtils annotate",
     )
 
@@ -236,9 +218,8 @@ def barcode(
 
     run_subprocess_command(
         matutils_extract_cmd,
-        console,
         is_debug,
-        success_message=f"Successfully ran matUtils extract. Outputs: lineagePaths.txt, samplePaths.txt, auspice_tree.json",
+        success_message="Successfully ran matUtils extract. Outputs: lineagePaths.txt, samplePaths.txt, auspice_tree.json",
         error_message_prefix="Error running matUtils extract",
     )
 
@@ -259,14 +240,10 @@ def barcode(
     # Determine base name for output files
     clean_prefix = prefix.strip()
     if clean_prefix:
-        console.print(
-            f"[{STYLES['info']}]Using prefix '{clean_prefix}' for lineage names in barcodes...[/{STYLES['info']}]"
-        )
+        print_info(f"Using prefix '{clean_prefix}' for lineage names in barcodes...")
         base_name = f"{clean_prefix}-barcode"
     else:
-        console.print(
-            f"[{STYLES['info']}]No prefix provided for lineage names in barcodes.[/{STYLES['info']}]"
-        )
+        print_info("No prefix provided for lineage names in barcodes.")
         base_name = "barcode"
 
     csv_path = f"{base_name}.csv"
@@ -285,9 +262,7 @@ def barcode(
         output_file_path=plot_output_path,
     )
 
-    console.print(
-        f"[{STYLES['success']}]Generated barcodes are saved to '{csv_path}' and plot saved to '{plot_output_path}'[/{STYLES['success']}]"
-    )
+    print_success(f"Generated barcodes are saved to '{csv_path}' and plot saved to '{plot_output_path}'")
 
 
 @cli.command()
@@ -334,16 +309,13 @@ def extract_auspice_data(
     Source: https://gist.github.com/huddlej/5d7bd023d3807c698bd18c706974f2db
     """
     is_debug = ctx.obj.get("DEBUG", False)  # More robust way to get debug status
-    console.print(
-        f"[bold {STYLES['info']}]Processing Auspice JSON file:[/bold {STYLES['info']}]\t{auspice_json_path}"
-    )
+    print_info(f"Processing Auspice JSON file:\t{auspice_json_path}", bold=True)
     process_auspice_json(
         tree_json_path=auspice_json_path,
         output_metadata_path=output_metadata_path,
         output_tree_path=output_tree_path,
         include_internal_nodes=include_internal_nodes,
         attributes=list(attributes) if attributes else None,
-        console=console,
     )
 
 

@@ -2,10 +2,7 @@ import pandas as pd
 from Bio import SeqIO
 from collections import OrderedDict
 import re
-from rich.console import Console
-from .utils import STYLES  # Assuming STYLES is in utils.py
-
-console = Console()
+from .utils import print_error, print_warning, print_success, print_info, print_debug
 
 
 def _load_sample_mutations(path):
@@ -137,15 +134,13 @@ def process_and_reroot_lineages(
     missing_count = len(sample_ids - set(seqs.keys()))
     if missing_count:
         total_count = len(sample_ids)
-        console.print(
-            f"[{STYLES['warning']}]Warning: {missing_count} out of {total_count} samples ({missing_count / total_count:.1%}) were not found in the FASTA file.[/{STYLES['warning']}]"
+        print_warning(
+            f"Warning: {missing_count} out of {total_count} samples ({missing_count / total_count:.1%}) were not found in the FASTA file."
         )
 
     # if reference in the sample mutations file, use that as the root
     if sample_muts_df[sample_muts_df["sample"] == ref.id].shape[0] > 0:
-        console.print(
-            f"[{STYLES['success']}]Reference {ref.id} is present in sample mutations file.[/{STYLES['success']}]"
-        )
+        print_success(f"Reference {ref.id} is present in sample mutations file.")
         additional_muts = _reverse_mutations_to_root(
             _extract_mutations(
                 sample_muts_df[sample_muts_df["sample"] == ref.id].iloc[0]
@@ -157,13 +152,11 @@ def process_and_reroot_lineages(
             additional_muts[i]["root"] = additional_muts[i].pop("mut")
 
         if debug:
-            console.print(
-                f"[{STYLES['debug']}]Additional mutations derived from reference {ref.id}: {additional_muts}[/{STYLES['debug']}]"
-            )
+            print_debug(f"Additional mutations derived from reference {ref.id}: {additional_muts}")
     # else generate the root sequence
     else:
-        console.print(
-            f"[{STYLES['warning']}]Reference {ref.id} not present in sample mutations file. Inferring root sequence.[/{STYLES['warning']}]"
+        print_warning(
+            f"Reference {ref.id} not present in sample mutations file. Inferring root sequence."
         )
         # Pre‑filter samples with non‑null mutations
         valid = sample_muts_df.loc[
@@ -180,9 +173,7 @@ def process_and_reroot_lineages(
             if seq is None:
                 # In debug mode, log a per-sample warning and track missing samples for a summary warning below.
                 if debug:
-                    console.print(
-                        f"[{STYLES['warning']}]Warning: Sample {sample_id} not found in FASTA file. Skipping.[/{STYLES['warning']}]"
-                    )
+                    print_warning(f"Warning: Sample {sample_id} not found in FASTA file. Skipping.")
                 continue
             root_seqs.append(_construct_root_sequence(root_muts, seq))
 
@@ -193,9 +184,7 @@ def process_and_reroot_lineages(
     # convert to dataframe and save as csv
     df = pd.DataFrame.from_dict(additional_muts, orient="index")
     df.to_csv(output_additional_muts_path, sep="\t", index_label="position")
-    console.print(
-        f"[{STYLES['success']}]Additional mutations saved to {output_additional_muts_path}[/{STYLES['success']}]"
-    )
+    print_success(f"Additional mutations saved to {output_additional_muts_path}")
 
     lineage_paths_df = _parse_tree_paths(
         pd.read_csv(input_lineage_paths_path, sep="\t").fillna("")
@@ -208,18 +197,14 @@ def process_and_reroot_lineages(
         )
 
     if not additional_muts_list:
-        console.print(
-            f"[{STYLES['warning']}]No additional mutations found to add to lineage paths.[/{STYLES['warning']}]"
-        )
+        print_warning("No additional mutations found to add to lineage paths.")
         # If no additional mutations, write the original lineage paths content or handle as needed
         # For now, let's just save the parsed (and potentially slightly reformatted) df
         lineage_paths_df["from_tree_root"] = lineage_paths_df["from_tree_root"].apply(
             lambda x: " ".join(x)
         )
     else:
-        console.print(
-            f"[{STYLES['info']}]Found {len(additional_muts_list)} additional mutations to incorporate into lineage paths.[/{STYLES['info']}]"
-        )
+        print_info(f"Found {len(additional_muts_list)} additional mutations to incorporate into lineage paths.")
 
         # add the additional mutations to the lineage paths after the first item
         # Ensure the logic for constructing the path string is robust
@@ -241,6 +226,4 @@ def process_and_reroot_lineages(
         )
 
     lineage_paths_df.to_csv(output_rerooted_lineage_paths_path, sep="\t")
-    console.print(
-        f"[{STYLES['success']}]Rerooted lineage paths saved to {output_rerooted_lineage_paths_path}[/{STYLES['success']}]"
-    )
+    print_success(f"Rerooted lineage paths saved to {output_rerooted_lineage_paths_path}")

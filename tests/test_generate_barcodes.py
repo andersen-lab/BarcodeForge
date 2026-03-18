@@ -1,5 +1,6 @@
 import pytest
 import pandas as pd
+import click
 from barcodeforge.generate_barcodes import (
     parse_tree_paths,
     convert_to_barcodes,
@@ -166,7 +167,7 @@ def temp_barcode_file_with_flips(tmp_path):
 
 
 def test_test_no_flip_pairs_with_flips(temp_barcode_file_with_flips):
-    with pytest.raises(Exception, match=r"FAIL: flip pairs found"):
+    with pytest.raises(click.Abort):
         check_no_flip_pairs(
             str(temp_barcode_file_with_flips)
         )  # Renamed from test_no_flip_pairs

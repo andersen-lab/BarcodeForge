@@ -1,9 +1,10 @@
 import json
 import pandas as pd
 import pytest
-from barcodeforge.auspice_tree_to_table import json_to_tree, process_auspice_json
 from rich.console import Console
 import click
+import barcodeforge.utils
+from barcodeforge.auspice_tree_to_table import json_to_tree, process_auspice_json
 
 
 @pytest.fixture
@@ -45,14 +46,12 @@ def test_json_to_tree_basic(sample_auspice_json):
 def test_process_auspice_json(tmp_path, sample_auspice_json):
     meta_out = tmp_path / "meta.tsv"
     tree_out = tmp_path / "tree.nwk"
-    console = Console(file=None)
     process_auspice_json(
         tree_json_path=str(sample_auspice_json),
         output_metadata_path=str(meta_out),
         output_tree_path=str(tree_out),
         include_internal_nodes=False,
         attributes=None,
-        console=console,
     )
     assert meta_out.exists()
     assert tree_out.exists()
@@ -64,14 +63,12 @@ def test_process_auspice_json(tmp_path, sample_auspice_json):
 def test_process_auspice_json_include_internal(tmp_path, sample_auspice_json):
     meta_out = tmp_path / "meta.tsv"
     tree_out = tmp_path / "tree.nwk"
-    console = Console(file=None)
     process_auspice_json(
         tree_json_path=str(sample_auspice_json),
         output_metadata_path=str(meta_out),
         output_tree_path=str(tree_out),
         include_internal_nodes=True,
         attributes=["country"],
-        console=console,
     )
     df = pd.read_csv(meta_out, sep="\t")
     assert set(df["name"]) == {"root", "A", "B"}
@@ -79,7 +76,8 @@ def test_process_auspice_json_include_internal(tmp_path, sample_auspice_json):
 
 
 def test_process_auspice_json_missing_file(tmp_path):
-    console = Console(record=True)
+    recording_console = Console(record=True)
+    barcodeforge.utils.console = recording_console
     with pytest.raises(click.Abort):
         process_auspice_json(
             tree_json_path=str(tmp_path / "no.json"),
@@ -87,15 +85,15 @@ def test_process_auspice_json_missing_file(tmp_path):
             output_tree_path=None,
             include_internal_nodes=False,
             attributes=None,
-            console=console,
         )
-    assert "Error: Tree JSON file not found" in console.export_text()
+    assert "Error: Tree JSON file not found" in recording_console.export_text()
 
 
 def test_process_auspice_json_bad_json(tmp_path):
     bad_path = tmp_path / "bad.json"
     bad_path.write_text("not valid")
-    console = Console(record=True)
+    recording_console = Console(record=True)
+    barcodeforge.utils.console = recording_console
     with pytest.raises(click.Abort):
         process_auspice_json(
             tree_json_path=str(bad_path),
@@ -103,6 +101,5 @@ def test_process_auspice_json_bad_json(tmp_path):
             output_tree_path=None,
             include_internal_nodes=False,
             attributes=None,
-            console=console,
         )
-    assert "Error: Could not decode JSON" in console.export_text()
+    assert "Error: Could not decode JSON" in recording_console.export_text()

@@ -3,10 +3,8 @@
 # This script is a modified version of the https://github.com/andersen-lab/Freyja/blob/main/freyja/convert_paths2barcodes.py
 
 import pandas as pd
-from rich.console import Console
-from .utils import sortFun, STYLES
-
-console = Console()
+import rich_click as click
+from .utils import sortFun, print_error, print_success, print_info, print_debug
 
 
 def parse_tree_paths(df: pd.DataFrame) -> pd.DataFrame:
@@ -57,7 +55,6 @@ def convert_to_barcodes(df: pd.DataFrame) -> pd.DataFrame:
         )
         df_barcodes = pd.concat((df_barcodes, cladeSeries), axis=1)
 
-    # console.print('separating combined splits') # Original print, can be made conditional with a verbose flag if needed
     df_barcodes = df_barcodes.T
     # dropped since no '' column this time.
     # df_barcodes = df_barcodes.drop(columns='')
@@ -118,7 +115,7 @@ def check_no_flip_pairs(barcode_file: str):
     Args:
         barcode_file (str): Path to the barcode file to be tested.
     Raises:
-        Exception: If flip pairs are found in the barcode file.
+        click.Abort: If flip pairs are found in the barcode file.
     """
     df_barcodes = pd.read_csv(barcode_file, index_col=0)
     flipPairs = [
@@ -127,15 +124,10 @@ def check_no_flip_pairs(barcode_file: str):
         if (d[-1] + d[1 : len(d) - 1] + d[0]) in df_barcodes.columns
     ]
     if len(flipPairs) == 0:
-        console.print(
-            f"[{STYLES['success']}]PASS: no flip pairs found in the generated barcode file.[/{STYLES['success']}]"
-        )
+        print_success("PASS: no flip pairs found in the generated barcode file.")
     else:
-        # This should ideally not happen if the logic is correct, consider logging or raising a more specific error.
-        console.print(
-            f"[{STYLES['error']}]FAIL: flip pairs found: {flipPairs}[/{STYLES['error']}]"
-        )
-        raise Exception(f"FAIL: flip pairs found: {flipPairs}")
+        print_error(f"FAIL: flip pairs found: {flipPairs}")
+        raise click.Abort()
 
 
 def check_allele_consistency(df_barcodes: pd.DataFrame):
@@ -150,6 +142,9 @@ def check_allele_consistency(df_barcodes: pd.DataFrame):
         ref = col[0]
         if pos in pos_refs:
             if pos_refs[pos] != ref:
+                print_error(
+                    f"Error: Position {pos} has multiple reference alleles: '{pos_refs[pos]}' and '{ref}'"
+                )
                 raise ValueError(
                     f"Position {pos} has multiple reference alleles: '{pos_refs[pos]}' and '{ref}'"
                 )
@@ -164,6 +159,9 @@ def check_allele_consistency(df_barcodes: pd.DataFrame):
         if len(cols) > 1:
             if (df_barcodes[cols].sum(axis=1) > 1).any():
                 lineages = df_barcodes[df_barcodes[cols].sum(axis=1) > 1].index.tolist()
+                print_error(
+                    f"Error: Position {pos} has multiple alternative alleles in lineages: {lineages}"
+                )
                 raise ValueError(
                     f"Position {pos} has multiple alternative alleles in lineages: {lineages}"
                 )
@@ -231,7 +229,6 @@ def check_mutation_chain(df_barcodes: pd.DataFrame) -> pd.DataFrame:
             # remove constituent mutations
             df_barcodes.loc[lin_seq.index, sm[0:2]] -= 1
         # drop all unused mutations
-        # print('before_trim\n',df_barcodes)
         df_barcodes = df_barcodes.drop(
             columns=df_barcodes.columns[df_barcodes.sum(axis=0) == 0]
         )
@@ -269,42 +266,32 @@ def create_barcodes_from_lineage_paths(
         prefix: Optional prefix to add to lineage names in the barcode file.
     """
     if debug:
-        console.print(
-            f"[{STYLES['info']}]Reading lineage paths from: {input_file_path}[/{STYLES['info']}]"
-        )
+        print_info(f"Reading lineage paths from: {input_file_path}")
     df = pd.read_csv(input_file_path, sep="\t")
 
     if debug:
-        console.print(f"[{STYLES['info']}]Parsing tree paths...[/{STYLES['info']}]")
+        print_info("Parsing tree paths...")
     df = parse_tree_paths(df)
 
-    console.print(f"[{STYLES['info']}]Converting to barcodes...[/{STYLES['info']}]")
+    print_info("Converting to barcodes...")
     df_barcodes = convert_to_barcodes(df)
 
     if prefix and prefix.strip() != "":
-        console.print(
-            f"[{STYLES['info']}]Adding prefix '{prefix}' to lineage names...[/{STYLES['info']}]"
-        )
+        print_info(f"Adding prefix '{prefix}' to lineage names...")
         df_barcodes.index = [prefix + "-" + str(i) for i in df_barcodes.index]
 
-    console.print(
-        f"[{STYLES['info']}]Performing reversion checking...[/{STYLES['info']}]"
-    )
+    print_info("Performing reversion checking...")
     df_barcodes = reversion_checking(df_barcodes)
 
-    console.print(f"[{STYLES['info']}]Checking mutation chains...[/{STYLES['info']}]")
+    print_info("Checking mutation chains...")
     df_barcodes = check_mutation_chain(df_barcodes)
 
     if debug:
-        console.print(
-            f"[{STYLES['info']}]Replacing underscores with dashes in lineage names...[/{STYLES['info']}]"
-        )
+        print_info("Replacing underscores with dashes in lineage names...")
     df_barcodes = replace_underscore_with_dash(df_barcodes)
 
     if debug:
-        console.print(
-            f"[{STYLES['info']}]Sorting barcode columns...[/{STYLES['info']}]"
-        )
+        print_info("Sorting barcode columns...")
     df_barcodes = df_barcodes.reindex(sorted(df_barcodes.columns, key=sortFun), axis=1)
 
     # Drop unclassified lineage if it exists
@@ -312,15 +299,7 @@ def create_barcodes_from_lineage_paths(
         df_barcodes = df_barcodes.drop(index="unclassified")
 
     df_barcodes.to_csv(output_file_path)
-    console.print(
-        f"[{STYLES['success']}]Barcode file saved to: {output_file_path}[/{STYLES['success']}]"
-    )
+    print_success(f"Barcode file saved to: {output_file_path}")
 
     # Test for flip pairs in the final output file
-    try:
-        check_no_flip_pairs(output_file_path)
-    except Exception as e:
-        console.print(
-            f"[{STYLES['error']}]Error during final flip pair test: {e}[/{STYLES['error']}]"
-        )
-        # Depending on desired behavior, you might re-raise the exception or just log it.
+    check_no_flip_pairs(output_file_path)

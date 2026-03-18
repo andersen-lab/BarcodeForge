@@ -4,10 +4,9 @@ import json
 import pandas as pd
 import Bio.Phylo
 from augur.utils import annotate_parents_for_tree
-from rich.console import Console
-import click  # For click.Abort
+import click
 
-from .utils import STYLES  # For consistent console messages
+from .utils import print_error, print_warning, print_success
 
 
 def json_to_tree(json_dict, root=True, parent_cumulative_branch_length=None):
@@ -128,7 +127,6 @@ def process_auspice_json(
     output_tree_path: str | None,
     include_internal_nodes: bool,
     attributes: list[str] | None,
-    console: Console,
 ):
     """
     Converts an Auspice JSON tree to other formats (Newick, metadata table).
@@ -138,14 +136,10 @@ def process_auspice_json(
         with open(tree_json_path, "r", encoding="utf-8") as fh:
             tree_json_data = json.load(fh)
     except FileNotFoundError:
-        console.print(
-            f"[{STYLES['error']}]Error: Tree JSON file not found at '{tree_json_path}'[/{STYLES['error']}]"
-        )
+        print_error(f"Error: Tree JSON file not found at '{tree_json_path}'")
         raise click.Abort()
     except json.JSONDecodeError:
-        console.print(
-            f"[{STYLES['error']}]Error: Could not decode JSON from '{tree_json_path}'[/{STYLES['error']}]"
-        )
+        print_error(f"Error: Could not decode JSON from '{tree_json_path}'")
         raise click.Abort()
 
     tree = json_to_tree(tree_json_data)
@@ -158,13 +152,9 @@ def process_auspice_json(
                 output_tree_path,
                 "newick",
             )
-            console.print(
-                f"[{STYLES['success']}]Tree successfully written to '{output_tree_path}'[/{STYLES['success']}]"
-            )
+            print_success(f"Tree successfully written to '{output_tree_path}'")
         except Exception as e:
-            console.print(
-                f"[{STYLES['error']}]Error writing Newick tree to '{output_tree_path}': {e}[/{STYLES['error']}]"
-            )
+            print_error(f"Error writing Newick tree to '{output_tree_path}': {e}")
             raise click.Abort()
 
     if output_metadata_path:
@@ -181,10 +171,10 @@ def process_auspice_json(
                 attrs_set.update(getattr(tree.root, "branch_attrs", {}).keys())
 
             if not attrs_set:
-                console.print(
-                    f"[{STYLES['warning']}]Warning: Could not auto-detect any attributes from the tree root. "
+                print_warning(
+                    "Warning: Could not auto-detect any attributes from the tree root. "
                     "The metadata output might be sparse or only contain 'name'. "
-                    f"Consider using --attributes to specify columns.[/{STYLES['warning']}]"
+                    "Consider using --attributes to specify columns."
                 )
             attributes_to_export = sorted(list(attrs_set))
 
@@ -254,18 +244,12 @@ def process_auspice_json(
                 header=True,
                 index=False,
             )
-            console.print(
-                f"[{STYLES['success']}]Metadata successfully written to '{output_metadata_path}'[/{STYLES['success']}]"
-            )
+            print_success(f"Metadata successfully written to '{output_metadata_path}'")
         except Exception as e:
-            console.print(
-                f"[{STYLES['error']}]Error writing metadata to '{output_metadata_path}': {e}[/{STYLES['error']}]"
-            )
+            print_error(f"Error writing metadata to '{output_metadata_path}': {e}")
             raise click.Abort()
 
     if not output_tree_path and not output_metadata_path:
         # This case should be handled by the CLI command to require at least one output.
         # However, a warning here is fine if called directly.
-        console.print(
-            f"[{STYLES['warning']}]No output requested. Use --output-tree and/or --output-metadata.[/{STYLES['warning']}]"
-        )
+        print_warning("No output requested. Use --output-tree and/or --output-metadata.")
