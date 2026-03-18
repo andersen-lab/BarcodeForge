@@ -84,18 +84,9 @@ def test_run_subprocess_command_failure_called_process_error(mock_subproc_run):
                 error_message_prefix="Test error CPE",
             )
 
-    expected_calls = [
-        call(
-            f"[{STYLES['error']}][ERROR] Test error CPE fail_cmd_cpe: Command '['fail_cmd_cpe']' returned non-zero exit status 1.[/{STYLES['error']}]"
-        ),
-        call(
-            f"[{STYLES['debug']}][DEBUG] fail_cmd_cpe stdout:\nout[/{STYLES['debug']}]"
-        ),
-        call(
-            f"[{STYLES['debug']}][DEBUG] fail_cmd_cpe stderr:\nError output cpe[/{STYLES['debug']}]"
-        ),
-    ]
-    mock_console.print.assert_has_calls(expected_calls)
+    mock_console.print.assert_called_once_with(
+        f"[{STYLES['error']}][ERROR] Test error CPE fail_cmd_cpe: Command '['fail_cmd_cpe']' returned non-zero exit status 1.[/{STYLES['error']}]"
+    )
 
 
 @patch("subprocess.run")
@@ -175,8 +166,10 @@ def test_run_subprocess_command_success_debug_empty_stderr(mock_subproc_run):
     ]
     mock_console.print.assert_has_calls(expected_calls, any_order=False)
     # Verify no stderr output line was printed (empty stderr is skipped)
-    all_calls = [str(c) for c in mock_console.print.call_args_list]
-    assert not any(" stderr:\n" in c for c in all_calls)
+    assert not any(
+        " stderr:\n" in c.args[0]
+        for c in mock_console.print.call_args_list
+    )
 
 
 @patch("subprocess.run")

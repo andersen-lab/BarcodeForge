@@ -136,10 +136,10 @@ def process_auspice_json(
         with open(tree_json_path, "r", encoding="utf-8") as fh:
             tree_json_data = json.load(fh)
     except FileNotFoundError:
-        print_error(f"Error: Tree JSON file not found at '{tree_json_path}'")
+        print_error(f"Tree JSON file not found at '{tree_json_path}'")
         raise click.Abort()
     except json.JSONDecodeError:
-        print_error(f"Error: Could not decode JSON from '{tree_json_path}'")
+        print_error(f"Could not decode JSON from '{tree_json_path}'")
         raise click.Abort()
 
     tree = json_to_tree(tree_json_data)
@@ -172,7 +172,7 @@ def process_auspice_json(
 
             if not attrs_set:
                 print_warning(
-                    "Warning: Could not auto-detect any attributes from the tree root. "
+                    "Could not auto-detect any attributes from the tree root. "
                     "The metadata output might be sparse or only contain 'name'. "
                     "Consider using --attributes to specify columns."
                 )

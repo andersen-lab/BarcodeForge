@@ -146,18 +146,20 @@ def check_allele_consistency(df_barcodes: pd.DataFrame):
         pos = bad_pos.index[0]
         conflicting = ref_series[pos].unique()
         print_error(
-            f"Error: Position {pos} has multiple reference alleles: '{conflicting[0]}' and '{conflicting[1]}'"
+            f"Position {pos} has multiple reference alleles: {', '.join(repr(a) for a in conflicting)}"
         )
         raise click.Abort()
 
-    # Sum mutation counts per position per lineage, then check for any > 1
-    pos_sums = df_barcodes.T.groupby(positions.values).sum().T
+    # Convert to presence/absence before summing per position per lineage,
+    # so only distinct alleles are counted (not raw mutation counts).
+    presence = (df_barcodes > 0).astype(int)
+    pos_sums = presence.T.groupby(positions.values).sum().T
     invalid_mask = pos_sums > 1
     if invalid_mask.any(axis=None):
         offending_pos = invalid_mask.columns[invalid_mask.any(axis=0)][0]
         lineages = pos_sums.index[invalid_mask[offending_pos]].tolist()
         print_error(
-            f"Error: Position {offending_pos} has multiple alternative alleles in lineages: {lineages}"
+            f"Position {offending_pos} has multiple alternative alleles in lineages: {lineages}"
         )
         raise click.Abort()
 

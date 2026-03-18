@@ -130,12 +130,19 @@ def test_replace_underscore_with_dash():
 
 
 def test_check_allele_consistency():
+    # Valid: same ref at each position, each lineage carries at most one allele per position
     df_valid = pd.DataFrame({"A123T": [1, 0], "A123C": [0, 1]})
     check_allele_consistency(df_valid)  # Should not raise
 
-    df_invalid = pd.DataFrame({"A123T": [1, 0], "C123G": [0, 1]})
+    # Invalid: conflicting reference alleles at position 123 (A vs C)
+    df_conflicting_refs = pd.DataFrame({"A123T": [1, 0], "C123G": [0, 1]})
     with pytest.raises(click.Abort):
-        check_allele_consistency(df_invalid)
+        check_allele_consistency(df_conflicting_refs)
+
+    # Invalid: lineage carries two distinct alleles at the same position
+    df_multi_alt = pd.DataFrame({"A123T": [1], "A123C": [1]}, index=["lin1"])
+    with pytest.raises(click.Abort):
+        check_allele_consistency(df_multi_alt)
 
 
 @pytest.fixture

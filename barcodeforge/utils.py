@@ -59,7 +59,7 @@ def resolve_tree_format(
             resolved_format = "nexus"
         else:
             print_error(
-                f"Error: Unknown tree format for file '{tree_path}'. Extension '{ext}' is not recognized."
+                f"Unknown tree format for file '{tree_path}'. Extension '{ext}' is not recognized."
             )
             print_error(
                 "Please specify the format using --tree-format ('newick' or 'nexus')."
@@ -85,7 +85,7 @@ def run_subprocess_command(
         success_message (str): Message to print on successful execution.
         error_message_prefix (str): Prefix for error messages.
     Returns:
-        bool: True if the command was executed successfully, False otherwise.
+        bool: True if the command was executed successfully.
     Raises:
         click.Abort: If the command fails or is not found.
     """
@@ -109,10 +109,11 @@ def run_subprocess_command(
         raise click.Abort()
     except subprocess.CalledProcessError as e:
         print_error(f"{error_message_prefix} {cmd[0]}: {e}")
-        if e.stdout:
-            print_debug(f"{cmd[0]} stdout:\n{e.stdout}")
-        if e.stderr:
-            print_debug(f"{cmd[0]} stderr:\n{e.stderr}")
+        if debug:
+            if e.stdout:
+                print_debug(f"{cmd[0]} stdout:\n{e.stdout}")
+            if e.stderr:
+                print_debug(f"{cmd[0]} stderr:\n{e.stderr}")
         raise click.Abort()
 
 

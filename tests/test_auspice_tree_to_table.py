@@ -2,6 +2,7 @@ import json
 import pandas as pd
 import pytest
 from rich.console import Console
+from unittest.mock import patch
 import click
 import barcodeforge.utils
 from barcodeforge.auspice_tree_to_table import json_to_tree, process_auspice_json
@@ -77,29 +78,29 @@ def test_process_auspice_json_include_internal(tmp_path, sample_auspice_json):
 
 def test_process_auspice_json_missing_file(tmp_path):
     recording_console = Console(record=True)
-    barcodeforge.utils.console = recording_console
-    with pytest.raises(click.Abort):
-        process_auspice_json(
-            tree_json_path=str(tmp_path / "no.json"),
-            output_metadata_path=str(tmp_path / "meta.tsv"),
-            output_tree_path=None,
-            include_internal_nodes=False,
-            attributes=None,
-        )
-    assert "Error: Tree JSON file not found" in recording_console.export_text()
+    with patch.object(barcodeforge.utils, "console", recording_console):
+        with pytest.raises(click.Abort):
+            process_auspice_json(
+                tree_json_path=str(tmp_path / "no.json"),
+                output_metadata_path=str(tmp_path / "meta.tsv"),
+                output_tree_path=None,
+                include_internal_nodes=False,
+                attributes=None,
+            )
+    assert "Tree JSON file not found" in recording_console.export_text()
 
 
 def test_process_auspice_json_bad_json(tmp_path):
     bad_path = tmp_path / "bad.json"
     bad_path.write_text("not valid")
     recording_console = Console(record=True)
-    barcodeforge.utils.console = recording_console
-    with pytest.raises(click.Abort):
-        process_auspice_json(
-            tree_json_path=str(bad_path),
-            output_metadata_path=None,
-            output_tree_path=None,
-            include_internal_nodes=False,
-            attributes=None,
-        )
-    assert "Error: Could not decode JSON" in recording_console.export_text()
+    with patch.object(barcodeforge.utils, "console", recording_console):
+        with pytest.raises(click.Abort):
+            process_auspice_json(
+                tree_json_path=str(bad_path),
+                output_metadata_path=None,
+                output_tree_path=None,
+                include_internal_nodes=False,
+                attributes=None,
+            )
+    assert "Could not decode JSON" in recording_console.export_text()

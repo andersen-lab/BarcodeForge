@@ -135,7 +135,7 @@ def process_and_reroot_lineages(
     if missing_count:
         total_count = len(sample_ids)
         print_warning(
-            f"Warning: {missing_count} out of {total_count} samples ({missing_count / total_count:.1%}) were not found in the FASTA file."
+            f"{missing_count} out of {total_count} samples ({missing_count / total_count:.1%}) were not found in the FASTA file."
         )
 
     # if reference in the sample mutations file, use that as the root
@@ -176,7 +176,7 @@ def process_and_reroot_lineages(
                 # In debug mode, log a per-sample warning and track missing samples for a summary warning below.
                 if debug:
                     print_warning(
-                        f"Warning: Sample {sample_id} not found in FASTA file. Skipping."
+                        f"Sample {sample_id} not found in FASTA file. Skipping."
                     )
                 continue
             root_seqs.append(_construct_root_sequence(root_muts, seq))
@@ -201,7 +201,7 @@ def process_and_reroot_lineages(
         )
 
     if not additional_muts_list:
-        print_info("No additional mutations found to add to lineage paths.")
+        print_warning("No additional mutations found to add to lineage paths.")
         # If no additional mutations, write the original lineage paths content or handle as needed
         # For now, let's just save the parsed (and potentially slightly reformatted) df
         lineage_paths_df["from_tree_root"] = lineage_paths_df["from_tree_root"].apply(
