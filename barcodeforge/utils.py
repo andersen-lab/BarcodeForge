@@ -3,26 +3,46 @@ import subprocess
 import rich_click as click
 from rich.console import Console
 
+console = Console()
+
 STYLES = {
     "info": "blue",
     "success": "green",
     "error": "bold red",
     "warning": "yellow",
     "debug": "cyan",
-    "dim": "dim",
-    "highlight": "bold magenta",
 }
 
 
+def print_error(msg: str) -> None:
+    console.print(f"[ERROR] {msg}", style=STYLES["error"], markup=False)
+
+
+def print_warning(msg: str) -> None:
+    console.print(f"[WARNING] {msg}", style=STYLES["warning"], markup=False)
+
+
+def print_success(msg: str) -> None:
+    console.print(f"[SUCCESS] {msg}", style=STYLES["success"], markup=False)
+
+
+def print_info(msg: str, bold: bool = False) -> None:
+    style = f"bold {STYLES['info']}" if bold else STYLES["info"]
+    console.print(f"[INFO] {msg}", style=style, markup=False)
+
+
+def print_debug(msg: str) -> None:
+    console.print(f"[DEBUG] {msg}", style=STYLES["debug"], markup=False)
+
+
 def resolve_tree_format(
-    tree_path: str, specified_format: str | None, console: Console, debug: bool
+    tree_path: str, specified_format: str | None, debug: bool
 ) -> str:
     """
     Resolves the format of a phylogenetic tree file based on its extension or specified_format.
     Args:
         tree_path (str): Path to the tree file.
         specified_format (str | None): User-specified format ('newick' or 'nexus').
-        console (Console): Rich console for output.
         debug (bool): If True, prints debug information.
     Returns:
         str: Resolved format ('newick' or 'nexus').
@@ -38,25 +58,21 @@ def resolve_tree_format(
         elif ext_lower == ".nexus":
             resolved_format = "nexus"
         else:
-            if console:
-                console.print(
-                    f"[{STYLES['error']}]Error: Unknown tree format for file '{tree_path}'. Extension '{ext}' is not recognized.[/{STYLES['error']}]"
-                )
-                console.print(
-                    f"[{STYLES['error']}]Please specify the format using --tree-format ('newick' or 'nexus').[/]"
-                )
+            print_error(
+                f"Unknown tree format for file '{tree_path}'. Extension '{ext}' is not recognized."
+            )
+            print_error(
+                "Please specify the format using --tree-format ('newick' or 'nexus')."
+            )
             raise click.Abort()
 
-    if debug and console:
-        console.print(
-            f"[{STYLES['warning']}]Resolved tree format for '{tree_path}': {resolved_format}[/]"
-        )
+    if debug:
+        print_debug(f"Resolved tree format for '{tree_path}': {resolved_format}")
     return resolved_format
 
 
 def run_subprocess_command(
     cmd: list[str],
-    console: Console,
     debug: bool,
     success_message: str = "Successfully executed command.",
     error_message_prefix: str = "Error executing command",
@@ -65,45 +81,39 @@ def run_subprocess_command(
     Runs a subprocess command and handles errors with rich output.
     Args:
         cmd (list[str]): Command to run as a list of strings.
-        console (Console): Rich console for output.
         debug (bool): If True, prints debug information.
         success_message (str): Message to print on successful execution.
         error_message_prefix (str): Prefix for error messages.
     Returns:
-        bool: True if the command was executed successfully, False otherwise.
+        bool: True if the command was executed successfully.
     Raises:
         click.Abort: If the command fails or is not found.
     """
-    if debug and console:
-        console.print(f"[{STYLES['debug']}]Running command: {' '.join(cmd)}[/]")
+    if debug:
+        print_debug(f"Running command: {' '.join(cmd)}")
 
     try:
         process_result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        if debug and console:
+        if debug:
             if process_result.stdout:
-                console.print(
-                    f"[{STYLES['dim']}]{cmd[0]} stdout:\\\\n{process_result.stdout}[/]"
-                )
+                print_debug(f"{cmd[0]} stdout:\n{process_result.stdout}")
             if process_result.stderr:
-                console.print(
-                    f"[{STYLES['dim']}]{cmd[0]} stderr:\\\\n{process_result.stderr}[/]"
-                )
-        if success_message and console:
-            console.print(f"[{STYLES['success']}]{success_message}[/]")
+                print_debug(f"{cmd[0]} stderr:\n{process_result.stderr}")
+        if success_message:
+            print_success(success_message)
         return True
     except FileNotFoundError:
-        if console:
-            console.print(
-                f"[{STYLES['error']}]{error_message_prefix}: {cmd[0]} command not found. Please ensure it is installed and in your PATH.[/]"
-            )
+        print_error(
+            f"{error_message_prefix}: {cmd[0]} command not found. Please ensure it is installed and in your PATH."
+        )
         raise click.Abort()
     except subprocess.CalledProcessError as e:
-        if console:
-            console.print(f"[{STYLES['error']}]{error_message_prefix} {cmd[0]}: {e}[/]")
+        print_error(f"{error_message_prefix} {cmd[0]}: {e}")
+        if debug:
             if e.stdout:
-                console.print(f"[{STYLES['dim']}]{cmd[0]} stdout:\\\\n{e.stdout}[/]")
+                print_debug(f"{cmd[0]} stdout:\n{e.stdout}")
             if e.stderr:
-                console.print(f"[{STYLES['dim']}]{cmd[0]} stderr:\\\\n{e.stderr}[/]")
+                print_debug(f"{cmd[0]} stderr:\n{e.stderr}")
         raise click.Abort()
 
 

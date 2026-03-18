@@ -1,5 +1,6 @@
 import pytest
 import pandas as pd
+import click
 from barcodeforge.generate_barcodes import (
     parse_tree_paths,
     convert_to_barcodes,
@@ -9,6 +10,7 @@ from barcodeforge.generate_barcodes import (
     check_mutation_chain,
     replace_underscore_with_dash,
     create_barcodes_from_lineage_paths,
+    check_allele_consistency,
 )
 from barcodeforge.utils import sortFun  # Assuming sortFun is in utils
 
@@ -26,7 +28,6 @@ def sample_barcode_data():
         "T123C": [1, 0],
         "G456A": [1, 0],
         "C789T": [0, 1],
-        "A123T": [0, 0],  # For reversion check
     }
     df = pd.DataFrame(data, index=["A", "B"])
     return df
@@ -112,7 +113,7 @@ def test_check_mutation_chain_non_binary_values():
             "C225A": [1],
             "G225T": [1],
             "T225C": [2],
-            "C123A": [2],
+            "C123A": [-1],
         },
         index=["lineage"],
     )
@@ -126,6 +127,22 @@ def test_replace_underscore_with_dash():
     replaced_df = replace_underscore_with_dash(df)
     assert "lineage-A" in replaced_df.index
     assert "lineage-B" in replaced_df.index
+
+
+def test_check_allele_consistency():
+    # Valid: same ref at each position, each lineage carries at most one allele per position
+    df_valid = pd.DataFrame({"A123T": [1, 0], "A123C": [0, 1]})
+    check_allele_consistency(df_valid)  # Should not raise
+
+    # Invalid: conflicting reference alleles at position 123 (A vs C)
+    df_conflicting_refs = pd.DataFrame({"A123T": [1, 0], "C123G": [0, 1]})
+    with pytest.raises(click.Abort):
+        check_allele_consistency(df_conflicting_refs)
+
+    # Invalid: lineage carries two distinct alleles at the same position
+    df_multi_alt = pd.DataFrame({"A123T": [1], "A123C": [1]}, index=["lin1"])
+    with pytest.raises(click.Abort):
+        check_allele_consistency(df_multi_alt)
 
 
 @pytest.fixture
@@ -155,7 +172,7 @@ def temp_barcode_file_with_flips(tmp_path):
 
 
 def test_test_no_flip_pairs_with_flips(temp_barcode_file_with_flips):
-    with pytest.raises(Exception, match=r"FAIL: flip pairs found"):
+    with pytest.raises(click.Abort):
         check_no_flip_pairs(
             str(temp_barcode_file_with_flips)
         )  # Renamed from test_no_flip_pairs

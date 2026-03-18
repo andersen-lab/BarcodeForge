@@ -7,6 +7,7 @@ from pathlib import Path
 import copy  # Ensure copy is imported
 from unittest.mock import MagicMock, call  # For console mocking
 from rich.console import Console  # For console spec
+import barcodeforge.utils
 from barcodeforge.ref_muts import (
     _load_sample_mutations,
     _extract_mutations,
@@ -263,7 +264,7 @@ def test_process_and_reroot_lineages_ref_not_in_muts_infer_root(
     output_rerooted_lineages = tmp_path / "rerooted_lineages_infer.tsv"
 
     mocked_console = MagicMock(spec=Console)
-    mocker.patch("barcodeforge.ref_muts.console", mocked_console)
+    mocker.patch("barcodeforge.utils.console", mocked_console)
 
     process_and_reroot_lineages(
         debug=False,
@@ -279,7 +280,7 @@ def test_process_and_reroot_lineages_ref_not_in_muts_infer_root(
     assert output_rerooted_lineages.exists()
 
     # Verify warning for inferred root
-    expected_warning_call_substr = "[yellow]Reference ref_genome not present in sample mutations file. Inferring root sequence."
+    expected_warning_call_substr = "[WARNING] Reference ref_genome not present in sample mutations file. Inferring root sequence."
     assert any(
         expected_warning_call_substr in str(c_args)
         for c_args in mocked_console.print.call_args_list
@@ -342,7 +343,7 @@ def test_process_and_reroot_lineages_warning_missing_sample_in_fasta(
     output_rerooted_lineages = tmp_path / "rerooted_lineages_missing_fasta.tsv"
 
     mocked_console = MagicMock(spec=Console)
-    mocker.patch("barcodeforge.ref_muts.console", mocked_console)
+    mocker.patch("barcodeforge.utils.console", mocked_console)
 
     # Inferred root will be based on sampleA only: AAAAAAAAAA
     # Additional muts (ref vs inferred): none
@@ -412,7 +413,7 @@ def test_process_and_reroot_lineages_debug_shows_per_sample_warning(
     output_rerooted_lineages = tmp_path / "rerooted_lineages_debug.tsv"
 
     mocked_console = MagicMock(spec=Console)
-    mocker.patch("barcodeforge.ref_muts.console", mocked_console)
+    mocker.patch("barcodeforge.utils.console", mocked_console)
 
     process_and_reroot_lineages(
         debug=True,
@@ -464,7 +465,7 @@ def test_process_and_reroot_lineages_summary_warning_any_missing(
     output_rerooted_lineages = tmp_path / "rerooted_lineages_below.tsv"
 
     mocked_console = MagicMock(spec=Console)
-    mocker.patch("barcodeforge.ref_muts.console", mocked_console)
+    mocker.patch("barcodeforge.utils.console", mocked_console)
 
     process_and_reroot_lineages(
         debug=False,

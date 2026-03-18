@@ -1,15 +1,11 @@
 """Plot barcode from CSV file."""
 
 import pandas as pd
-from rich.console import Console
-
-from .utils import sortFun, STYLES
+from .utils import sortFun, print_info, print_debug
 import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 import math
-
-console = Console()
 
 
 def create_barcode_visualization(
@@ -137,21 +133,13 @@ def create_barcode_plot(
         output_file_path: Path to save the generated plot.
     """
     if debug:
-        console.print(
-            f"[{STYLES['info']}]Reading barcode data from: {input_file_path}[/{STYLES['info']}]"
-        )
+        print_info(f"Reading barcode data from: {input_file_path}")
     barcode_df = pd.read_csv(input_file_path, header=0, index_col=0)
 
     if debug:
-        console.print(
-            f"[{STYLES['debug']}]Barcode DataFrame shape: {barcode_df.shape}[/{STYLES['debug']}]"
-        )
-        console.print(
-            f"[{STYLES['debug']}]Barcode DataFrame columns: {barcode_df.columns.tolist()}[/{STYLES['debug']}]"
-        )
-        console.print(
-            f"[{STYLES['info']}]Transforming barcode data to long format...[/{STYLES['info']}]"
-        )
+        print_debug(f"Barcode DataFrame shape: {barcode_df.shape}")
+        print_debug(f"Barcode DataFrame columns: {barcode_df.columns.tolist()}")
+        print_info("Transforming barcode data to long format...")
     barcode_df_long = barcode_df.stack().reset_index()
     barcode_df_long.columns = ["Lineage", "Mutation", "z"]
 
