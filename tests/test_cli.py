@@ -493,7 +493,7 @@ def test_barcode_command_debug_flag(runner, temp_files, mocker):
     final_barcode_plot_fn = "barcode_plot.pdf"
 
     mock_cli_console.print.assert_any_call(
-        f"[{STYLES['debug']}]Debug mode is ON[/{STYLES['debug']}]"
+        f"[{STYLES['debug']}][DEBUG] Debug mode is ON[/{STYLES['debug']}]"
     )
     mock_resolve_format.assert_called_once_with(
         temp_files["tree"], None, True

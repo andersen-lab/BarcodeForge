@@ -197,7 +197,7 @@ def process_and_reroot_lineages(
         )
 
     if not additional_muts_list:
-        print_warning("No additional mutations found to add to lineage paths.")
+        print_info("No additional mutations found to add to lineage paths.")
         # If no additional mutations, write the original lineage paths content or handle as needed
         # For now, let's just save the parsed (and potentially slightly reformatted) df
         lineage_paths_df["from_tree_root"] = lineage_paths_df["from_tree_root"].apply(
