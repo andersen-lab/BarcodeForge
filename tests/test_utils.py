@@ -166,10 +166,7 @@ def test_run_subprocess_command_success_debug_empty_stderr(mock_subproc_run):
     ]
     mock_console.print.assert_has_calls(expected_calls, any_order=False)
     # Verify no stderr output line was printed (empty stderr is skipped)
-    assert not any(
-        " stderr:\n" in c.args[0]
-        for c in mock_console.print.call_args_list
-    )
+    assert not any(" stderr:\n" in c.args[0] for c in mock_console.print.call_args_list)
 
 
 @patch("subprocess.run")
