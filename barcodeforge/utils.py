@@ -15,24 +15,24 @@ STYLES = {
 
 
 def print_error(msg: str) -> None:
-    console.print(f"[{STYLES['error']}][ERROR] {msg}[/{STYLES['error']}]")
+    console.print(f"[ERROR] {msg}", style=STYLES["error"], markup=False)
 
 
 def print_warning(msg: str) -> None:
-    console.print(f"[{STYLES['warning']}][WARNING] {msg}[/{STYLES['warning']}]")
+    console.print(f"[WARNING] {msg}", style=STYLES["warning"], markup=False)
 
 
 def print_success(msg: str) -> None:
-    console.print(f"[{STYLES['success']}][SUCCESS] {msg}[/{STYLES['success']}]")
+    console.print(f"[SUCCESS] {msg}", style=STYLES["success"], markup=False)
 
 
 def print_info(msg: str, bold: bool = False) -> None:
     style = f"bold {STYLES['info']}" if bold else STYLES["info"]
-    console.print(f"[{style}][INFO] {msg}[/{style}]")
+    console.print(f"[INFO] {msg}", style=style, markup=False)
 
 
 def print_debug(msg: str) -> None:
-    console.print(f"[{STYLES['debug']}][DEBUG] {msg}[/{STYLES['debug']}]")
+    console.print(f"[DEBUG] {msg}", style=STYLES["debug"], markup=False)
 
 
 def resolve_tree_format(

@@ -48,7 +48,9 @@ def test_resolve_tree_format_debug_output():
     with patch.object(barcodeforge.utils, "console", mock_console):
         resolve_tree_format("some.nwk", None, debug=True)
     mock_console.print.assert_any_call(
-        f"[{STYLES['debug']}][DEBUG] Resolved tree format for 'some.nwk': newick[/{STYLES['debug']}]"
+        "[DEBUG] Resolved tree format for 'some.nwk': newick",
+        style=STYLES["debug"],
+        markup=False,
     )
 
 
@@ -66,7 +68,9 @@ def test_run_subprocess_command_success(mock_subproc_run):
         )
     assert result is True
     mock_console.print.assert_called_once_with(
-        f"[{STYLES['success']}][SUCCESS] Command executed successfully[/{STYLES['success']}]"
+        "[SUCCESS] Command executed successfully",
+        style=STYLES["success"],
+        markup=False,
     )
 
 
@@ -85,7 +89,9 @@ def test_run_subprocess_command_failure_called_process_error(mock_subproc_run):
             )
 
     mock_console.print.assert_called_once_with(
-        f"[{STYLES['error']}][ERROR] Test error CPE fail_cmd_cpe: Command '['fail_cmd_cpe']' returned non-zero exit status 1.[/{STYLES['error']}]"
+        "[ERROR] Test error CPE fail_cmd_cpe: Command '['fail_cmd_cpe']' returned non-zero exit status 1.",
+        style=STYLES["error"],
+        markup=False,
     )
 
 
@@ -102,7 +108,9 @@ def test_run_subprocess_command_file_not_found(mock_subproc_run):
             )
 
     mock_console.print.assert_called_once_with(
-        f"[{STYLES['error']}][ERROR] FNF error: non_existent_cmd command not found. Please ensure it is installed and in your PATH.[/{STYLES['error']}]"
+        "[ERROR] FNF error: non_existent_cmd command not found. Please ensure it is installed and in your PATH.",
+        style=STYLES["error"],
+        markup=False,
     )
 
 
@@ -123,16 +131,10 @@ def test_run_subprocess_command_success_debug(mock_subproc_run):
         )
     assert result is True
     expected_calls = [
-        call(
-            f"[{STYLES['debug']}][DEBUG] Running command: debug_cmd_success arg1[/{STYLES['debug']}]"
-        ),
-        call(
-            f"[{STYLES['debug']}][DEBUG] debug_cmd_success stdout:\nDebug success output[/{STYLES['debug']}]"
-        ),
-        call(
-            f"[{STYLES['debug']}][DEBUG] debug_cmd_success stderr:\nDebug success stderr[/{STYLES['debug']}]"
-        ),
-        call(f"[{STYLES['success']}][SUCCESS] Debug success[/{STYLES['success']}]"),
+        call("[DEBUG] Running command: debug_cmd_success arg1", style=STYLES["debug"], markup=False),
+        call("[DEBUG] debug_cmd_success stdout:\nDebug success output", style=STYLES["debug"], markup=False),
+        call("[DEBUG] debug_cmd_success stderr:\nDebug success stderr", style=STYLES["debug"], markup=False),
+        call("[SUCCESS] Debug success", style=STYLES["success"], markup=False),
     ]
     mock_console.print.assert_has_calls(expected_calls, any_order=False)
 
@@ -154,15 +156,9 @@ def test_run_subprocess_command_success_debug_empty_stderr(mock_subproc_run):
         )
     assert result is True
     expected_calls = [
-        call(
-            f"[{STYLES['debug']}][DEBUG] Running command: debug_cmd_success_no_stderr[/{STYLES['debug']}]"
-        ),
-        call(
-            f"[{STYLES['debug']}][DEBUG] debug_cmd_success_no_stderr stdout:\nDebug success output[/{STYLES['debug']}]"
-        ),
-        call(
-            f"[{STYLES['success']}][SUCCESS] Debug success no stderr[/{STYLES['success']}]"
-        ),
+        call("[DEBUG] Running command: debug_cmd_success_no_stderr", style=STYLES["debug"], markup=False),
+        call("[DEBUG] debug_cmd_success_no_stderr stdout:\nDebug success output", style=STYLES["debug"], markup=False),
+        call("[SUCCESS] Debug success no stderr", style=STYLES["success"], markup=False),
     ]
     mock_console.print.assert_has_calls(expected_calls, any_order=False)
     # Verify no stderr output line was printed (empty stderr is skipped)
@@ -186,17 +182,9 @@ def test_run_subprocess_command_failure_debug(mock_subproc_run):
             )
 
     expected_calls_in_order = [
-        call(
-            f"[{STYLES['debug']}][DEBUG] Running command: {' '.join(cmd_list)}[/{STYLES['debug']}]"
-        ),
-        call(
-            f"[{STYLES['error']}][ERROR] Debug fail error {cmd_list[0]}: Command '{cmd_list}' returned non-zero exit status 1.[/{STYLES['error']}]"
-        ),
-        call(
-            f"[{STYLES['debug']}][DEBUG] {cmd_list[0]} stdout:\nDebug fail stdout[/{STYLES['debug']}]"
-        ),
-        call(
-            f"[{STYLES['debug']}][DEBUG] {cmd_list[0]} stderr:\nDebug fail stderr[/{STYLES['debug']}]"
-        ),
+        call(f"[DEBUG] Running command: {' '.join(cmd_list)}", style=STYLES["debug"], markup=False),
+        call(f"[ERROR] Debug fail error {cmd_list[0]}: Command '{cmd_list}' returned non-zero exit status 1.", style=STYLES["error"], markup=False),
+        call(f"[DEBUG] {cmd_list[0]} stdout:\nDebug fail stdout", style=STYLES["debug"], markup=False),
+        call(f"[DEBUG] {cmd_list[0]} stderr:\nDebug fail stderr", style=STYLES["debug"], markup=False),
     ]
     mock_console.print.assert_has_calls(expected_calls_in_order, any_order=False)

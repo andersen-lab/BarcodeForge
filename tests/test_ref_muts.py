@@ -280,7 +280,7 @@ def test_process_and_reroot_lineages_ref_not_in_muts_infer_root(
     assert output_rerooted_lineages.exists()
 
     # Verify warning for inferred root
-    expected_warning_call_substr = "[yellow][WARNING] Reference ref_genome not present in sample mutations file. Inferring root sequence."
+    expected_warning_call_substr = "[WARNING] Reference ref_genome not present in sample mutations file. Inferring root sequence."
     assert any(
         expected_warning_call_substr in str(c_args)
         for c_args in mocked_console.print.call_args_list
