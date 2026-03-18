@@ -131,9 +131,21 @@ def test_run_subprocess_command_success_debug(mock_subproc_run):
         )
     assert result is True
     expected_calls = [
-        call("[DEBUG] Running command: debug_cmd_success arg1", style=STYLES["debug"], markup=False),
-        call("[DEBUG] debug_cmd_success stdout:\nDebug success output", style=STYLES["debug"], markup=False),
-        call("[DEBUG] debug_cmd_success stderr:\nDebug success stderr", style=STYLES["debug"], markup=False),
+        call(
+            "[DEBUG] Running command: debug_cmd_success arg1",
+            style=STYLES["debug"],
+            markup=False,
+        ),
+        call(
+            "[DEBUG] debug_cmd_success stdout:\nDebug success output",
+            style=STYLES["debug"],
+            markup=False,
+        ),
+        call(
+            "[DEBUG] debug_cmd_success stderr:\nDebug success stderr",
+            style=STYLES["debug"],
+            markup=False,
+        ),
         call("[SUCCESS] Debug success", style=STYLES["success"], markup=False),
     ]
     mock_console.print.assert_has_calls(expected_calls, any_order=False)
@@ -156,9 +168,19 @@ def test_run_subprocess_command_success_debug_empty_stderr(mock_subproc_run):
         )
     assert result is True
     expected_calls = [
-        call("[DEBUG] Running command: debug_cmd_success_no_stderr", style=STYLES["debug"], markup=False),
-        call("[DEBUG] debug_cmd_success_no_stderr stdout:\nDebug success output", style=STYLES["debug"], markup=False),
-        call("[SUCCESS] Debug success no stderr", style=STYLES["success"], markup=False),
+        call(
+            "[DEBUG] Running command: debug_cmd_success_no_stderr",
+            style=STYLES["debug"],
+            markup=False,
+        ),
+        call(
+            "[DEBUG] debug_cmd_success_no_stderr stdout:\nDebug success output",
+            style=STYLES["debug"],
+            markup=False,
+        ),
+        call(
+            "[SUCCESS] Debug success no stderr", style=STYLES["success"], markup=False
+        ),
     ]
     mock_console.print.assert_has_calls(expected_calls, any_order=False)
     # Verify no stderr output line was printed (empty stderr is skipped)
@@ -182,9 +204,25 @@ def test_run_subprocess_command_failure_debug(mock_subproc_run):
             )
 
     expected_calls_in_order = [
-        call(f"[DEBUG] Running command: {' '.join(cmd_list)}", style=STYLES["debug"], markup=False),
-        call(f"[ERROR] Debug fail error {cmd_list[0]}: Command '{cmd_list}' returned non-zero exit status 1.", style=STYLES["error"], markup=False),
-        call(f"[DEBUG] {cmd_list[0]} stdout:\nDebug fail stdout", style=STYLES["debug"], markup=False),
-        call(f"[DEBUG] {cmd_list[0]} stderr:\nDebug fail stderr", style=STYLES["debug"], markup=False),
+        call(
+            f"[DEBUG] Running command: {' '.join(cmd_list)}",
+            style=STYLES["debug"],
+            markup=False,
+        ),
+        call(
+            f"[ERROR] Debug fail error {cmd_list[0]}: Command '{cmd_list}' returned non-zero exit status 1.",
+            style=STYLES["error"],
+            markup=False,
+        ),
+        call(
+            f"[DEBUG] {cmd_list[0]} stdout:\nDebug fail stdout",
+            style=STYLES["debug"],
+            markup=False,
+        ),
+        call(
+            f"[DEBUG] {cmd_list[0]} stderr:\nDebug fail stderr",
+            style=STYLES["debug"],
+            markup=False,
+        ),
     ]
     mock_console.print.assert_has_calls(expected_calls_in_order, any_order=False)
