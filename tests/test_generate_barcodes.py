@@ -134,9 +134,7 @@ def test_check_allele_consistency():
     check_allele_consistency(df_valid)  # Should not raise
 
     df_invalid = pd.DataFrame({"A123T": [1, 0], "C123G": [0, 1]})
-    with pytest.raises(
-        ValueError, match="Position 123 has multiple reference alleles: 'A' and 'C'"
-    ):
+    with pytest.raises(click.Abort):
         check_allele_consistency(df_invalid)
 
 

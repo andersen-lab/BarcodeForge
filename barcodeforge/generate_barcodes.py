@@ -135,36 +135,31 @@ def check_allele_consistency(df_barcodes: pd.DataFrame):
     Extract columns and ensure for every position ([1:-1]) there is only 1 reference allele ([0]).
     Additionally check if any lineage has multiple alternative alleles at the same position.
     """
-    pos_refs = {}
-    pos_cols = {}
-    for col in df_barcodes.columns:
-        pos = col[1:-1]
-        ref = col[0]
-        if pos in pos_refs:
-            if pos_refs[pos] != ref:
-                print_error(
-                    f"Error: Position {pos} has multiple reference alleles: '{pos_refs[pos]}' and '{ref}'"
-                )
-                raise ValueError(
-                    f"Position {pos} has multiple reference alleles: '{pos_refs[pos]}' and '{ref}'"
-                )
-        else:
-            pos_refs[pos] = ref
+    positions = df_barcodes.columns.str[1:-1]
+    refs = df_barcodes.columns.str[0]
 
-        if pos not in pos_cols:
-            pos_cols[pos] = []
-        pos_cols[pos].append(col)
+    # Check for multiple reference alleles at the same position
+    ref_series = pd.Series(refs.values, index=positions)
+    bad_pos = ref_series.groupby(level=0).nunique()
+    bad_pos = bad_pos[bad_pos > 1]
+    if not bad_pos.empty:
+        pos = bad_pos.index[0]
+        conflicting = ref_series[pos].unique()
+        print_error(
+            f"Error: Position {pos} has multiple reference alleles: '{conflicting[0]}' and '{conflicting[1]}'"
+        )
+        raise click.Abort()
 
-    for pos, cols in pos_cols.items():
-        if len(cols) > 1:
-            if (df_barcodes[cols].sum(axis=1) > 1).any():
-                lineages = df_barcodes[df_barcodes[cols].sum(axis=1) > 1].index.tolist()
-                print_error(
-                    f"Error: Position {pos} has multiple alternative alleles in lineages: {lineages}"
-                )
-                raise ValueError(
-                    f"Position {pos} has multiple alternative alleles in lineages: {lineages}"
-                )
+    # Sum mutation counts per position per lineage, then check for any > 1
+    pos_sums = df_barcodes.T.groupby(positions.values).sum().T
+    invalid_mask = pos_sums > 1
+    if invalid_mask.any(axis=None):
+        offending_pos = invalid_mask.columns[invalid_mask.any(axis=0)][0]
+        lineages = pos_sums.index[invalid_mask[offending_pos]].tolist()
+        print_error(
+            f"Error: Position {offending_pos} has multiple alternative alleles in lineages: {lineages}"
+        )
+        raise click.Abort()
 
 
 def identify_chains(df_barcodes: pd.DataFrame) -> list:
