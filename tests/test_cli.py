@@ -90,9 +90,7 @@ def test_barcode_command_default_options(runner, temp_files, mocker):
         "barcodeforge.cli.create_barcodes_from_lineage_paths"
     )
     mock_create_plot = mocker.patch("barcodeforge.cli.create_barcode_plot")
-    mock_cli_console = mocker.patch.object(
-        barcodeforge.utils, "console", MagicMock(spec=Console)
-    )
+    mocker.patch.object(barcodeforge.utils, "console", MagicMock(spec=Console))
 
     args = [
         "barcode",
@@ -225,9 +223,7 @@ def test_barcode_command_custom_options(runner, temp_files, mocker):
         "barcodeforge.cli.create_barcodes_from_lineage_paths"
     )
     mock_create_plot = mocker.patch("barcodeforge.cli.create_barcode_plot")
-    mock_cli_console = mocker.patch.object(
-        barcodeforge.utils, "console", MagicMock(spec=Console)
-    )
+    mocker.patch.object(barcodeforge.utils, "console", MagicMock(spec=Console))
 
     prefix = "MYPREFIX"
     custom_usher_args = "-U -l"
@@ -376,9 +372,7 @@ def test_barcode_command_nexus_tree(runner, temp_files, mocker):
     mocker.patch("barcodeforge.cli.process_and_reroot_lineages")
     mocker.patch("barcodeforge.cli.create_barcodes_from_lineage_paths")
     mocker.patch("barcodeforge.cli.create_barcode_plot")
-    mock_cli_console = mocker.patch.object(
-        barcodeforge.utils, "console", MagicMock(spec=Console)
-    )
+    mocker.patch.object(barcodeforge.utils, "console", MagicMock(spec=Console))
 
     args = [
         "barcode",
@@ -432,9 +426,7 @@ def test_barcode_command_newick_tree_reformat(runner, temp_files, mocker):
     mocker.patch("barcodeforge.cli.process_and_reroot_lineages")
     mocker.patch("barcodeforge.cli.create_barcodes_from_lineage_paths")
     mocker.patch("barcodeforge.cli.create_barcode_plot")
-    mock_cli_console = mocker.patch.object(
-        barcodeforge.utils, "console", MagicMock(spec=Console)
-    )
+    mocker.patch.object(barcodeforge.utils, "console", MagicMock(spec=Console))
 
     args = [
         "barcode",

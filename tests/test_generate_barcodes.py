@@ -12,7 +12,6 @@ from barcodeforge.generate_barcodes import (
     create_barcodes_from_lineage_paths,
     check_allele_consistency,
 )
-from barcodeforge.utils import sortFun  # Assuming sortFun is in utils
 
 
 # Sample data for testing

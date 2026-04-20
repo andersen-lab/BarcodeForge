@@ -2,7 +2,7 @@ import pandas as pd
 from Bio import SeqIO
 from collections import OrderedDict
 import re
-from .utils import print_error, print_warning, print_success, print_info, print_debug
+from .utils import print_warning, print_success, print_info, print_debug
 
 
 def _load_sample_mutations(path):

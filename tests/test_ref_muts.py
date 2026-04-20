@@ -3,11 +3,9 @@ import pandas as pd
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from collections import OrderedDict
-from pathlib import Path
 import copy  # Ensure copy is imported
-from unittest.mock import MagicMock, call  # For console mocking
+from unittest.mock import MagicMock  # For console mocking
 from rich.console import Console  # For console spec
-import barcodeforge.utils
 from barcodeforge.ref_muts import (
     _load_sample_mutations,
     _extract_mutations,
@@ -74,11 +72,6 @@ def test_load_sample_mutations(sample_muts_file):
 
 
 def test_extract_mutations():
-    sample_with_muts = {"mutations": "gene1:A123T,C456G>gene2:X1Y"}
-    extracted = _extract_mutations(sample_with_muts)
-    expected = OrderedDict(
-        [("gene2:X1Y", ["gene2:X1Y"]), ("gene1:A123T,C456G", ["gene1:A123T", "C456G"])]
-    )
     # The original code's MUT_PATTERN and splitting logic might be different.
     # This test is based on a common interpretation. Adjust if your MUT_PATTERN is more complex.
     # Based on the provided code: MUT_PATTERN = re.compile(r"([^:]+):([A-Za-z0-9,]+)")

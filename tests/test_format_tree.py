@@ -2,7 +2,6 @@ import pytest
 from pathlib import Path
 from barcodeforge.format_tree import convert_nexus_to_newick, _remove_quotes_from_file
 import tempfile
-import os
 
 # Sample Nexus content
 SAMPLE_NEXUS_CONTENT = """

@@ -4,7 +4,7 @@
 
 import pandas as pd
 import rich_click as click
-from .utils import sortFun, print_error, print_success, print_info, print_debug
+from .utils import sortFun, print_error, print_success, print_info
 
 
 def parse_tree_paths(df: pd.DataFrame) -> pd.DataFrame:

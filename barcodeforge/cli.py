@@ -318,7 +318,6 @@ def extract_auspice_data(
     Inspired by Dr. John Huddleston's Gist on processing Auspice JSON files.
     Source: https://gist.github.com/huddlej/5d7bd023d3807c698bd18c706974f2db
     """
-    is_debug = ctx.obj.get("DEBUG", False)  # More robust way to get debug status
     print_info(f"Processing Auspice JSON file:\t{auspice_json_path}", bold=True)
     process_auspice_json(
         tree_json_path=auspice_json_path,
