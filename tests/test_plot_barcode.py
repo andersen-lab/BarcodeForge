@@ -1,10 +1,7 @@
 import pytest
 import pandas as pd
 from pathlib import Path
-from barcodeforge.plot_barcode import create_barcode_visualization, create_barcode_plot
-import matplotlib.pyplot as plt
-import seaborn as sns
-from matplotlib.colors import ListedColormap
+from barcodeforge.plot_barcode import create_barcode_visualization
 
 
 @pytest.fixture

@@ -1,7 +1,7 @@
 """Plot barcode from CSV file."""
 
 import pandas as pd
-from .utils import sortFun, print_info, print_debug
+from .utils import print_info, print_debug
 import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
@@ -46,7 +46,6 @@ def create_barcode_visualization(
     # Prepare chunks
     chunks = []
     dims = []
-    cat_dtype = pd.CategoricalDtype(categories=base_list, ordered=True)
     for i in range(num_chunks):
         ps = all_pos[i * CHUNK : (i + 1) * CHUNK]
         sub = plot_df[plot_df.pos.isin(ps)]
