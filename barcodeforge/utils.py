@@ -2,6 +2,7 @@ import os
 import subprocess
 import rich_click as click
 from rich.console import Console
+from Bio import SeqIO
 
 console = Console()
 
@@ -69,6 +70,75 @@ def resolve_tree_format(
     if debug:
         print_debug(f"Resolved tree format for '{tree_path}': {resolved_format}")
     return resolved_format
+
+
+def ensure_reference_is_first_in_alignment(
+    reference_genome_path: str,
+    alignment_path: str,
+    output_alignment_path: str,
+    debug: bool,
+) -> str:
+    """
+    Ensures the reference genome is the first sequence in the alignment.
+
+    faToVcf treats the first sequence in the alignment as the reference. If the
+    reference genome is not already the first sequence, a corrected alignment is
+    written to ``output_alignment_path`` with the reference genome prepended (and
+    any existing record sharing the reference id removed to avoid duplicates), and
+    that path is returned. If the reference is already first, the original
+    alignment path is returned unchanged.
+
+    Args:
+        reference_genome_path (str): Path to the reference genome FASTA file.
+        alignment_path (str): Path to the alignment FASTA file.
+        output_alignment_path (str): Path to write the corrected alignment to if
+            the reference genome needs to be added.
+        debug (bool): If True, prints debug information.
+    Returns:
+        str: Path to the alignment to use downstream (the original path if no
+            change was needed, otherwise ``output_alignment_path``).
+    Raises:
+        click.Abort: If the alignment is empty, or the reference genome length
+            does not match the aligned sequence length.
+    """
+    ref = SeqIO.read(reference_genome_path, "fasta")
+    records = list(SeqIO.parse(alignment_path, "fasta"))
+
+    if not records:
+        print_error(f"Alignment file '{alignment_path}' contains no sequences.")
+        raise click.Abort()
+
+    if records[0].id == ref.id:
+        if debug:
+            print_debug(
+                f"Reference genome '{ref.id}' is already the first sequence in the alignment."
+            )
+        return alignment_path
+
+    print_warning(
+        f"The first sequence in the alignment ('{records[0].id}') is not the "
+        f"reference genome ('{ref.id}'). Prepending the reference genome to the alignment."
+    )
+
+    alignment_width = len(records[0].seq)
+    if len(ref.seq) != alignment_width:
+        print_error(
+            f"Cannot add the reference genome to the alignment: the reference length "
+            f"({len(ref.seq)}) does not match the aligned sequence length "
+            f"({alignment_width}). faToVcf requires all sequences to be the same length. "
+            f"Please provide a reference that is aligned to the same coordinates as the alignment."
+        )
+        raise click.Abort()
+
+    # Drop any existing record that shares the reference id to avoid duplicate
+    # sample names, then place the reference genome first.
+    corrected = [ref] + [rec for rec in records if rec.id != ref.id]
+    SeqIO.write(corrected, output_alignment_path, "fasta")
+    print_success(
+        f"Wrote corrected alignment with reference genome '{ref.id}' as the first "
+        f"sequence to {output_alignment_path}"
+    )
+    return output_alignment_path
 
 
 def run_subprocess_command(

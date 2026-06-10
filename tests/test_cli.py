@@ -32,9 +32,11 @@ def temp_files(tmp_path):
     lineages = tmp_path / "lineages.tsv"
 
     create_dummy_file(ref_genome, ">ref_genome_id\nAGCTAGCTAGCTAGCT")
+    # The reference genome must be the first sequence in the alignment, since
+    # faToVcf treats the first sequence as the reference.
     create_dummy_file(
         alignment,
-        ">seq1\nAGCTAGCTAGCTAGCT\n>seq2\nAGCTAGCTAGCTCGCT\n>seq3\nAGCTAGCTAGCTAGGT",
+        ">ref_genome_id\nAGCTAGCTAGCTAGCT\n>seq1\nAGCTAGCTAGCTAGCT\n>seq2\nAGCTAGCTAGCTCGCT\n>seq3\nAGCTAGCTAGCTAGGT",
     )
     create_dummy_file(tree, "((seq1:0.1,seq2:0.1):0.05,seq3:0.15);")
     create_dummy_file(lineages, "clade\tsequences\nlineageA\tseq1,seq2\nlineageB\tseq3")
@@ -535,6 +537,60 @@ def test_barcode_command_missing_file(runner, temp_files):
     result = runner.invoke(cli, args)
     assert result.exit_code != 0
     assert "Invalid value for 'ALIGNMENT'" in result.output
+
+
+def test_barcode_command_reference_not_first_in_alignment(runner, temp_files, mocker):
+    # Alignment whose first sequence is NOT the reference genome: the reference
+    # should be prepended and the corrected alignment used for the rest of the run.
+    create_dummy_file(
+        temp_files["alignment"],
+        ">seq1\nAGCTAGCTAGCTAGCT\n>seq2\nAGCTAGCTAGCTCGCT\n>seq3\nAGCTAGCTAGCTAGGT",
+    )
+    mock_run_subp = mocker.patch(
+        "barcodeforge.cli.run_subprocess_command", return_value=True
+    )
+    mocker.patch("barcodeforge.cli.resolve_tree_format", return_value="newick")
+    mocker.patch("barcodeforge.cli.convert_nexus_to_newick")
+    mock_process_reroot = mocker.patch("barcodeforge.cli.process_and_reroot_lineages")
+    mocker.patch("barcodeforge.cli.create_barcodes_from_lineage_paths")
+    mocker.patch("barcodeforge.cli.create_barcode_plot")
+    mocker.patch.object(barcodeforge.utils, "console", MagicMock(spec=Console))
+
+    intermediate_dir = "barcodeforge_workdir"
+    corrected_alignment_fn = f"{intermediate_dir}/alignment_with_reference.fasta"
+    aligned_vcf_fn = f"{intermediate_dir}/aligned.vcf"
+
+    args = [
+        "barcode",
+        temp_files["ref_genome"],
+        temp_files["alignment"],
+        temp_files["tree"],
+        temp_files["lineages"],
+    ]
+    try:
+        result = runner.invoke(cli, args, catch_exceptions=False)
+        assert result.exit_code == 0, f"CLI failed: {result.output}"
+
+        # faToVcf and rerooting should use the corrected alignment, not the input.
+        mock_run_subp.assert_any_call(
+            ["faToVcf", corrected_alignment_fn, aligned_vcf_fn],
+            False,
+            success_message=ANY,
+            error_message_prefix=ANY,
+        )
+        assert (
+            mock_process_reroot.call_args.kwargs["sequences_fasta_path"]
+            == corrected_alignment_fn
+        )
+
+        # The corrected alignment should have the reference genome as its first record.
+        from Bio import SeqIO
+
+        records = list(SeqIO.parse(corrected_alignment_fn, "fasta"))
+        assert records[0].id == "ref_genome_id"
+        assert [r.id for r in records] == ["ref_genome_id", "seq1", "seq2", "seq3"]
+    finally:
+        shutil.rmtree(intermediate_dir, ignore_errors=True)
 
 
 def test_extract_auspice_data_command(runner, tmp_path):

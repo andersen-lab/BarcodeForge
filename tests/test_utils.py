@@ -1,6 +1,7 @@
 import pytest
 import click
 import subprocess
+from pathlib import Path
 from unittest.mock import MagicMock, patch, call
 from rich.console import Console
 import barcodeforge.utils
@@ -8,8 +9,83 @@ from barcodeforge.utils import (
     sortFun,
     resolve_tree_format,
     run_subprocess_command,
+    ensure_reference_is_first_in_alignment,
     STYLES,
 )
+from Bio import SeqIO
+
+
+def _write_fasta(path, content):
+    with open(path, "w") as f:
+        f.write(content)
+    return str(path)
+
+
+def test_ensure_reference_first_already_first(tmp_path):
+    ref = _write_fasta(tmp_path / "ref.fasta", ">ref\nACGT")
+    aln = _write_fasta(tmp_path / "aln.fasta", ">ref\nACGT\n>seq1\nACGA")
+    out = str(tmp_path / "out.fasta")
+    # Reference already first: returns the original path and writes nothing.
+    result = ensure_reference_is_first_in_alignment(ref, aln, out, debug=False)
+    assert result == aln
+    assert not Path(out).exists()
+
+
+def test_ensure_reference_first_prepends_when_absent(tmp_path):
+    ref = _write_fasta(tmp_path / "ref.fasta", ">ref\nACGT")
+    aln = _write_fasta(tmp_path / "aln.fasta", ">seq1\nACGA\n>seq2\nACGC")
+    out = str(tmp_path / "out.fasta")
+    result = ensure_reference_is_first_in_alignment(ref, aln, out, debug=False)
+    assert result == out
+    records = list(SeqIO.parse(out, "fasta"))
+    assert [r.id for r in records] == ["ref", "seq1", "seq2"]
+    assert str(records[0].seq) == "ACGT"
+
+
+def test_ensure_reference_first_dedupes_existing_reference(tmp_path):
+    ref = _write_fasta(tmp_path / "ref.fasta", ">ref\nACGT")
+    # Reference present but not first; should be moved to the front, not duplicated.
+    aln = _write_fasta(tmp_path / "aln.fasta", ">seq1\nACGA\n>ref\nACGT")
+    out = str(tmp_path / "out.fasta")
+    result = ensure_reference_is_first_in_alignment(ref, aln, out, debug=False)
+    assert result == out
+    records = list(SeqIO.parse(out, "fasta"))
+    assert [r.id for r in records] == ["ref", "seq1"]
+
+
+def test_ensure_reference_first_length_mismatch_aborts(tmp_path):
+    ref = _write_fasta(tmp_path / "ref.fasta", ">ref\nACG")
+    aln = _write_fasta(tmp_path / "aln.fasta", ">seq1\nACGA\n>seq2\nACGC")
+    out = str(tmp_path / "out.fasta")
+    mock_console = MagicMock(spec=Console)
+    with patch.object(barcodeforge.utils, "console", mock_console):
+        with pytest.raises(click.Abort):
+            ensure_reference_is_first_in_alignment(ref, aln, out, debug=False)
+    assert not Path(out).exists()
+    printed = " ".join(c.args[0] for c in mock_console.print.call_args_list)
+    assert "does not match" in printed
+
+
+def test_ensure_reference_first_empty_alignment_aborts(tmp_path):
+    ref = _write_fasta(tmp_path / "ref.fasta", ">ref\nACGT")
+    aln = _write_fasta(tmp_path / "aln.fasta", "")
+    out = str(tmp_path / "out.fasta")
+    with pytest.raises(click.Abort):
+        ensure_reference_is_first_in_alignment(ref, aln, out, debug=False)
+
+
+def test_ensure_reference_first_debug_output(tmp_path):
+    ref = _write_fasta(tmp_path / "ref.fasta", ">ref\nACGT")
+    aln = _write_fasta(tmp_path / "aln.fasta", ">ref\nACGT\n>seq1\nACGA")
+    out = str(tmp_path / "out.fasta")
+    mock_console = MagicMock(spec=Console)
+    with patch.object(barcodeforge.utils, "console", mock_console):
+        ensure_reference_is_first_in_alignment(ref, aln, out, debug=True)
+    mock_console.print.assert_any_call(
+        "[DEBUG] Reference genome 'ref' is already the first sequence in the alignment.",
+        style=STYLES["debug"],
+        markup=False,
+    )
 
 
 def test_sortFun():
