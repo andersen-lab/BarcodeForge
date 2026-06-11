@@ -4,6 +4,7 @@ from .format_tree import convert_nexus_to_newick
 from .utils import (
     resolve_tree_format,
     run_subprocess_command,
+    ensure_reference_is_first_in_alignment,
     print_error,
     print_success,
     print_info,
@@ -108,6 +109,16 @@ def barcode(
     # Directory for intermediate files
     intermediate_dir = "barcodeforge_workdir"
     os.makedirs(intermediate_dir, exist_ok=True)
+
+    # faToVcf uses the first sequence in the alignment as the reference for calling
+    # variants. If the reference genome is not already first, prepend it and use the
+    # corrected alignment (written to the workdir) for the rest of the pipeline.
+    alignment = ensure_reference_is_first_in_alignment(
+        reference_genome,
+        alignment,
+        os.path.join(intermediate_dir, "alignment_with_reference.fasta"),
+        is_debug,
+    )
 
     # Run faToVcf command using utility function
     fatovcf_output_vcf = os.path.join(intermediate_dir, "aligned.vcf")
