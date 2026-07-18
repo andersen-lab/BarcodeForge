@@ -1,8 +1,15 @@
 import pandas as pd
+import rich_click as click
 from Bio import SeqIO
 from collections import OrderedDict
 import re
-from .utils import print_warning, print_success, print_info, print_debug
+from .utils import (
+    print_warning,
+    print_success,
+    print_info,
+    print_debug,
+    print_error,
+)
 
 
 def _load_sample_mutations(path):
@@ -26,11 +33,7 @@ def _extract_mutations(sample):
 def _reverse_mutations_to_root(muts):
     """Reverse the mutations to the root node."""
     root_muts = {}
-    if muts == {}:
-        root_muts[0] = {
-            "base": "",
-            "mut": "",
-        }
+    if not muts:
         return root_muts
     for value in muts.values():
         for i in value:
@@ -78,19 +81,20 @@ def _compare_sequences(ref, root):
 # generate a consensus root sequence
 def _derive_root_sequence(root_seqs):
     """Generate a consensus root sequence."""
+    if not root_seqs:
+        print_error(
+            "Cannot infer a root sequence: none of the samples in the mutations "
+            "file were found in the alignment FASTA."
+        )
+        raise click.Abort()
     # for each position in the sequence get the most common nucleotide and add it to the consensus sequence
     consensus_root = ""
     for i in range(len(root_seqs[0].seq)):
-        nucs = []
-        for seq in root_seqs:
-            nucs.append(seq.seq[i])
-        # eliminate nucleotides that are not A, T, C, or G or if all nucleotides are the same
-        nucs = [
-            x
-            for x in nucs
-            if x.upper() in ["A", "T", "C", "G", "N"] or len(set(nucs)) == 1
-        ]
-        consensus_root += max(set(nucs), key=nucs.count)
+        nucs = [seq.seq[i] for seq in root_seqs]
+        candidates = [x for x in nucs if x.upper() in ["A", "T", "C", "G"]]
+        if not candidates:
+            candidates = nucs
+        consensus_root += max(sorted(set(candidates)), key=candidates.count)
     return consensus_root
 
 

@@ -75,6 +75,10 @@ def json_to_tree(json_dict, root=True, parent_cumulative_branch_length=None):
         if attr != "children":
             setattr(node, attr, value)
 
+    # Default so the child recursion can always read node.cumulative_branch_length,
+    # even for a node that has children but neither 'attr' (v1) nor 'node_attrs' (v2).
+    node.cumulative_branch_length = None
+
     # Handle specific attributes like 'num_date', 'div' (cumulative_branch_length),
     # and 'translations' based on JSON version (v1 uses 'attr', v2 uses 'node_attrs').
     if hasattr(node, "attr"):  # v1 style
@@ -226,8 +230,12 @@ def process_auspice_json(
 
         if records:
             df = pd.DataFrame(records)
+            # "name" is always emitted first; exclude it from the attribute list so
+            # `--attributes name` cannot produce two identical 'name' columns.
             final_columns = ["name"] + [
-                attr for attr in attributes_to_export if attr in df.columns
+                attr
+                for attr in attributes_to_export
+                if attr in df.columns and attr != "name"
             ]
             # Add any other columns that might have been added but were not in attributes_to_export.
             for col in df.columns:

@@ -81,7 +81,7 @@ def convert_nexus_to_newick(
         tree_string_from_file = ""
         with open(output_file_str, "r") as handle:
             for line in handle:
-                l = line.strip("\\n")
+                l = line.strip()
                 if "(" in l:
                     tree_string_start = l.index("(")
                     tree_string_from_file = l[tree_string_start:]

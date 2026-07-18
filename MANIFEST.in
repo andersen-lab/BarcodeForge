@@ -1,15 +1,9 @@
 include README.md
 include LICENSE
 include pyproject.toml
-include meta.yaml
-include environment.yml
-include conda_build_config.yaml
-include build.sh
-include bld.bat
 
 # Include package data
 recursive-include barcodeforge *.py
-recursive-include barcodeforge/assets *
 
 # Include tests
 recursive-include tests *.py
