@@ -1,17 +1,14 @@
 [project]
 name = "BarcodeForge"
-version = "1.1.5"
+version = "1.2.1"
 description = "A CLI tool for generating pathogen-specific barcodes for Freyja."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "dendropy>=4.5.2",
     "ete4>=4.3.0",
-    "pathlib>=1.0.1",
     "rich-click>=1.6.0",
     "rich>=10.0.0",
-    "six>=1.16.0",
-    "numpy>=1.20.0",
     "pandas>=1.3.0",
     "biopython>=1.78",
     "seaborn>=0.13.2",

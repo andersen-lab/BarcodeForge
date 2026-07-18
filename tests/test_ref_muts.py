@@ -106,7 +106,7 @@ def test_reverse_mutations_to_root():
     expected = {1: {"base": "G", "mut": "A"}, 2: {"base": "T", "mut": "C"}}
     assert reversed_muts == expected
 
-    assert _reverse_mutations_to_root(OrderedDict()) == {0: {"base": "", "mut": ""}}
+    assert _reverse_mutations_to_root(OrderedDict()) == {}
 
 
 def test_construct_root_sequence():

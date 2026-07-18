@@ -19,8 +19,7 @@ def parse_tree_paths(df: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame: A DataFrame with clade names as the index and a list of mutations for each clade.
     """
     df = df.set_index("clade")
-    # Make sure to check with new tree versions, lineages could get trimmed.
-    df = df.drop_duplicates(keep="last")
+    df = df[~df.index.duplicated(keep="last")]
     df["from_tree_root"] = df["from_tree_root"].fillna("")
     df["from_tree_root"] = df["from_tree_root"].apply(
         lambda x: x.replace(" ", "").strip(">").split(">")

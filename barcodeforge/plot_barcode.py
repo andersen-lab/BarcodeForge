@@ -1,7 +1,7 @@
 """Plot barcode from CSV file."""
 
 import pandas as pd
-from .utils import print_info, print_debug
+from .utils import print_info, print_debug, print_warning
 import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
@@ -19,6 +19,10 @@ def create_barcode_visualization(
     df[["Reference", "pos", "alt"]] = df.Mutation.str.extract(
         r"([A-Za-z]+)(\d+)([A-Za-z]+)"
     )
+    df = df.dropna(subset=["pos"])
+    if df.empty:
+        print_warning("No plottable mutations found; skipping barcode plot.")
+        return
     df.pos = df.pos.astype(int)
     wide = (
         df.drop(columns=["Mutation", "z"])

@@ -1,4 +1,5 @@
 import os
+import re
 import subprocess
 import rich_click as click
 from rich.console import Console
@@ -101,7 +102,15 @@ def ensure_reference_is_first_in_alignment(
         click.Abort: If the alignment is empty, or the reference genome length
             does not match the aligned sequence length.
     """
-    ref = SeqIO.read(reference_genome_path, "fasta")
+    try:
+        ref = SeqIO.read(reference_genome_path, "fasta")
+    except ValueError as e:
+        # SeqIO.read raises ValueError if the file has zero or more than one record.
+        print_error(
+            f"Reference genome '{reference_genome_path}' must contain exactly one "
+            f"sequence ({e})."
+        )
+        raise click.Abort()
     records = list(SeqIO.parse(alignment_path, "fasta"))
 
     if not records:
@@ -177,6 +186,11 @@ def run_subprocess_command(
             f"{error_message_prefix}: {cmd[0]} command not found. Please ensure it is installed and in your PATH."
         )
         raise click.Abort()
+    except PermissionError:
+        print_error(
+            f"{error_message_prefix}: {cmd[0]} is not executable. Please check its file permissions."
+        )
+        raise click.Abort()
     except subprocess.CalledProcessError as e:
         print_error(f"{error_message_prefix} {cmd[0]}: {e}")
         if debug:
@@ -199,5 +213,7 @@ def sortFun(x: str) -> int:
     Returns:
         int: The numeric position extracted from the mutation string.
     """
-    # sort based on nuc position, ignoring nuc identities
-    return int(x[1 : (len(x) - 1)])
+    match = re.search(r"\d+", x)
+    if match is None:
+        raise ValueError(f"Cannot extract a numeric position from mutation '{x}'")
+    return int(match.group())

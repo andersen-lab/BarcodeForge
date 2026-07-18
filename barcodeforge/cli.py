@@ -1,4 +1,5 @@
 import os
+import shlex
 import rich_click as click
 from .format_tree import convert_nexus_to_newick
 from .utils import (
@@ -166,7 +167,7 @@ def barcode(
     # Run usher command
     usher_cmd = ["usher"]
     if usher_args:
-        usher_cmd.extend(usher_args.split())  # Split space-separated string of args
+        usher_cmd.extend(shlex.split(usher_args))
     usher_cmd.extend(
         [
             "-t",
